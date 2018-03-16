@@ -17,7 +17,7 @@
     "links": [
       {"name": "VividCortex", "url": "https://github.com/vividcortex/grafana-metrics-datasource"}
     ],
-    "version": "0.0.10",
+    "version": "0.0.1",
     "updated": "2018-03-14"
   },
 

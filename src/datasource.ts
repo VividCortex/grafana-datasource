@@ -13,7 +13,9 @@ export default class VividCortexMetricsDatasource {
   }
 
   query(options) {
-    throw new Error('Query Support not implemented yet.');
+    console.warn(options);
+
+    return this.$q.when({data: []});
   }
 
   annotationQuery(options) {
@@ -21,7 +23,9 @@ export default class VividCortexMetricsDatasource {
   }
 
   metricFindQuery(query: string) {
-    throw new Error('Template Variable Support not implemented yet.');
+    console.warn(query);
+
+    return this.$q.when({data: ["upper_25","upper_50","upper_75","upper_90","upper_95"]});
   }
 
   testDatasource() {
