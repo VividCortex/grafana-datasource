@@ -1,36 +1,64 @@
-///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
 
 import _ from 'lodash';
 
 export default class VividCortexMetricsDatasource {
-  id: number;
-  name: string;
+  org: string;
+  apiToken: string;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
-    this.name = instanceSettings.name;
-    this.id = instanceSettings.id;
-
-    console.log(arguments);
+    this.org = instanceSettings.jsonData.org;
+    this.apiToken = instanceSettings.jsonData.apiToken;
   }
 
   query(options) {
-    throw new Error("Query Support not implemented yet.");
+    throw new Error('Query Support not implemented yet.');
   }
 
   annotationQuery(options) {
-    throw new Error("Annotation Support not implemented yet.");
+    throw new Error('Annotation Support not implemented yet.');
   }
 
   metricFindQuery(query: string) {
-    throw new Error("Template Variable Support not implemented yet.");
+    throw new Error('Template Variable Support not implemented yet.');
   }
 
   testDatasource() {
+    if (this.org === 'vividcortex' && this.apiToken === 'abc123') {
+      return this.$q.when({
+        status: 'success',
+        message: 'Your VividCortex datasource was successfully configured.',
+        title: 'Success'
+      });
+    }
+
     return this.$q.when({
       status: 'error',
-      message: 'Data Source is just a template and has not been implemented yet.',
-      title: 'Error'
+      message: 'The API token or organization name are incorrect.',
+      title: 'Credentials error'
     });
+
+    /*return this.doRequest({
+      url: '/',
+      method: 'GET',
+    }).then(response => {
+      if (response.status === 200) {
+        return { status: 'success', message: 'Data source is working', title: 'Success' };
+      }
+    });*/
+  }
+
+
+  /**
+   * Perform an HTTP request.
+   *
+   * @param  {Object} options
+   * @return {Promise}
+   */
+  doRequest(options) {
+    options.headers = {'Content-Type': 'application/json'};
+
+    return this.backendSrv.datasourceRequest(options);
   }
 }
