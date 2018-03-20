@@ -13,8 +13,6 @@ export default class VividCortexMetricsDatasource {
   }
 
   query(options) {
-    console.warn(options);
-
     return this.$q.when({data: []});
   }
 
@@ -23,9 +21,15 @@ export default class VividCortexMetricsDatasource {
   }
 
   metricFindQuery(query: string) {
-    console.warn(query);
+    return this.doRequest('metrics', 'GET')
+      .then(response => response.data.data || [])
+      .then(metrics => {
+        console.warn(metrics);
 
-    return this.$q.when(["upper_25","upper_50","upper_75","upper_90","upper_95"]);
+        return metrics.map((metric) => {
+          return metric.name;
+        });
+      });
   }
 
   testDatasource() {
