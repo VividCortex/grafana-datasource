@@ -25,32 +25,29 @@ export default class VividCortexMetricsDatasource {
   metricFindQuery(query: string) {
     console.warn(query);
 
-    return this.$q.when({data: ["upper_25","upper_50","upper_75","upper_90","upper_95"]});
+    return this.$q.when(["upper_25","upper_50","upper_75","upper_90","upper_95"]);
   }
 
   testDatasource() {
-    if (this.org === 'vividcortex' && this.apiToken === 'abc123') {
-      return this.$q.when({
-        status: 'success',
-        message: 'Your VividCortex datasource was successfully configured.',
-        title: 'Success'
-      });
-    }
-
-    return this.$q.when({
+    const success = {
+      status: 'success',
+      message: 'Your VividCortex datasource was successfully configured.',
+      title: 'Success'
+    }, error = {
       status: 'error',
       message: 'The API token or organization name are incorrect.',
       title: 'Credentials error'
-    });
+    };
 
-    /*return this.doRequest({
-      url: '/',
-      method: 'GET',
-    }).then(response => {
-      if (response.status === 200) {
-        return { status: 'success', message: 'Data source is working', title: 'Success' };
-      }
-    });*/
+    return this.doRequest('metrics?limit=1', 'GET')
+      .then(response => {
+        if (response.status === 200) {
+          return success;
+        }
+        return error
+      }, () => {
+        return error;
+      });
   }
 
 
@@ -60,8 +57,15 @@ export default class VividCortexMetricsDatasource {
    * @param  {Object} options
    * @return {Promise}
    */
-  doRequest(options) {
-    options.headers = {'Content-Type': 'application/json'};
+  doRequest(endpoint, method) {
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+this.apiToken,
+      },
+      url: 'https://'+this.org+'.app.vividcortex.com/api/v2/'+endpoint,
+      method: method,
+    };
 
     return this.backendSrv.datasourceRequest(options);
   }
