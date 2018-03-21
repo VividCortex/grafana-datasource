@@ -24,8 +24,8 @@ export default class VividCortexMetricsDatasource {
       from: parameters.params.from,
       rank: 1,
       samplesize: 12,
-      until: parameters.params.from,
-      host: '0,211',
+      until: parameters.params.until,
+      host: parameters.hosts,
     };
 
     const body = {
@@ -116,14 +116,19 @@ export default class VividCortexMetricsDatasource {
       return target.target != 'select metric' ? target.target : metric;
     }, null);
 
+    const hosts = options.targets.reduce((hosts, target) => {
+      return target.target != 'select metric' ? target.hosts : hosts;
+    }, null);
+
     if (!metric) { return null; }
 
     return {
       metric: metric,
+      hosts: '0,'+hosts,
       params: {
         from: options.range.from.unix(),
         until: options.range.to.unix()
-      }
+      },
     };
   }
 
@@ -151,8 +156,6 @@ export default class VividCortexMetricsDatasource {
          })
        }]
      };
-
-     console.warn(response);
 
      return response;
    }
