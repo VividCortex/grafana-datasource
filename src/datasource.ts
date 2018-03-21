@@ -5,6 +5,7 @@ import _ from 'lodash';
 export default class VividCortexMetricsDatasource {
   org: string;
   apiToken: string;
+  metrics: Array<any>;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
@@ -39,14 +40,22 @@ export default class VividCortexMetricsDatasource {
   }
 
   annotationQuery(options) {
-    throw new Error('Annotation Support not implemented yet.');
+    throw new Error('Annotation support not implemented yet.');
   }
 
   metricFindQuery(query: string) {
+    if (this.metrics) {
+      return this.filterMetrics(this.metrics, query);
+    }
+
     return this.doRequest('metrics', 'GET')
       .then(response => response.data.data || [])
       .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
-      .then(metrics => metrics.filter(metric => metric.text.indexOf(query) > -1));
+      .then(metrics => {
+        this.metrics = metrics;
+
+        return this.filterMetrics(metrics, query);
+      });
   }
 
   testDatasource() {
@@ -121,32 +130,41 @@ export default class VividCortexMetricsDatasource {
   /**
    * Maps a VividCortex series response to Grafana's structure.
    *
-   * @param  {Object} metrics
+   * @param  {Array} series
    * @param  {number} from
    * @param  {number} until
    * @return {Array}
    */
-  mapQueryResponse(metrics, from: number, until: number) {
-    console.warn(arguments);
+   mapQueryResponse(series: Array<any>, from: number, until: number) {
+     if (! series.length || !series[0].elements.length) {
+       return { data: [] };
+     }
 
-    if (! metrics.length || !metrics[0].elements.length) {
-      return { data: [] };
-    }
+     const values = series[0].elements[0].series;
+     const sampleSize = (until - from) / (values.length);
 
-    const values = metrics[0].elements[0].series;
-    const sampleSize = (until - from) / (values.length);
+     const response = {
+       data: [{
+         target: series[0].elements[0].metric,
+         datapoints: values.map((value, index) => {
+             return [value, (from + index * sampleSize) * 1e3];
+         })
+       }]
+     };
 
-    const response = {
-      data: [{
-        target: metrics[0].elements[0].metric,
-        datapoints: values.map((value, index) => {
-            return [value, (from + index * sampleSize) * 1e3];
-        })
-      }]
-    };
+     console.warn(response);
 
-    console.warn(response);
+     return response;
+   }
 
-    return response;
+  /**
+   * Filters the metrics that matches the query string.
+   *
+   * @param  {Array} metrics
+   * @param  {string} query
+   * @return {Array}
+   */
+  filterMetrics(metrics: Array<any>, query: string) {
+    return metrics.filter(metric => metric.text.indexOf(query) > -1)
   }
 }
