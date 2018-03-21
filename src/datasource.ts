@@ -32,10 +32,9 @@ export default class VividCortexMetricsDatasource {
     };
 
     return this.doRequest('metrics/query-series', 'POST', params, body)
+      .then(response => ({ metrics: response.data.data || [], from: parseInt(response.headers('X-Vc-Meta-From')), until: parseInt(response.headers('X-Vc-Meta-Until')) }))
       .then(response => {
-        console.warn(response);
-
-        return [];
+        return this.mapQueryResponse(response.metrics, response.from, response.until);
       })
   }
 
@@ -72,7 +71,6 @@ export default class VividCortexMetricsDatasource {
       });
   }
 
-
   /**
    * Perform an HTTP request.
    *
@@ -97,7 +95,6 @@ export default class VividCortexMetricsDatasource {
     return this.backendSrv.datasourceRequest(options);
   }
 
-
   /**
    * Takes a Grafana query object and returns an object with the required information to query
    * VividCortex, or null if there is an error or no selected metrics.
@@ -119,5 +116,37 @@ export default class VividCortexMetricsDatasource {
         until: options.range.to.unix()
       }
     };
+  }
+
+  /**
+   * Maps a VividCortex series response to Grafana's structure.
+   *
+   * @param  {Object} metrics
+   * @param  {number} from
+   * @param  {number} until
+   * @return {Array}
+   */
+  mapQueryResponse(metrics, from: number, until: number) {
+    console.warn(arguments);
+
+    if (! metrics.length || !metrics[0].elements.length) {
+      return { data: [] };
+    }
+
+    const values = metrics[0].elements[0].series;
+    const sampleSize = (until - from) / (values.length);
+
+    const response = {
+      data: [{
+        target: metrics[0].elements[0].metric,
+        datapoints: values.map((value, index) => {
+            return [value, (from + index * sampleSize) * 1e3];
+        })
+      }]
+    };
+
+    console.warn(response);
+
+    return response;
   }
 }
