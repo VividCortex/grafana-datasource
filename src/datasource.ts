@@ -22,7 +22,6 @@ export default class VividCortexMetricsDatasource {
 
     const params = {
       from: parameters.params.from,
-      rank: 1,
       samplesize: 12,
       until: parameters.params.until,
       host: parameters.hosts,
@@ -51,6 +50,7 @@ export default class VividCortexMetricsDatasource {
     return this.doRequest('metrics', 'GET')
       .then(response => response.data.data || [])
       .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
+      .then(metrics => metrics.sort((a, b) => a.text === b.text ? 0 : (a.text > b.text ? 1 : -1)))
       .then(metrics => {
         this.metrics = metrics;
 
