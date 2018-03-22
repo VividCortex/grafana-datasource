@@ -35,7 +35,7 @@ export default class VividCortexMetricsDatasource {
       .then(response => ({ metrics: response.data.data || [], from: parseInt(response.headers('X-Vc-Meta-From')), until: parseInt(response.headers('X-Vc-Meta-Until')) }))
       .then(response => {
         return this.mapQueryResponse(response.metrics, response.from, response.until);
-      })
+      });
   }
 
   annotationQuery(options) {

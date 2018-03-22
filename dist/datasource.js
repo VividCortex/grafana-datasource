@@ -21,7 +21,6 @@ System.register([], function(exports_1) {
                     }
                     var params = {
                         from: parameters.params.from,
-                        rank: 1,
                         samplesize: 12,
                         until: parameters.params.until,
                         host: parameters.hosts,
@@ -46,7 +45,9 @@ System.register([], function(exports_1) {
                     return this.doRequest('metrics', 'GET')
                         .then(function (response) { return response.data.data || []; })
                         .then(function (metrics) { return metrics.map(function (metric) { return ({ text: metric.name, value: metric.name }); }); })
+                        .then(function (metrics) { return metrics.sort(function (a, b) { return a.text === b.text ? 0 : (a.text > b.text ? 1 : -1); }); })
                         .then(function (metrics) {
+                        console.warn(metrics);
                         _this.metrics = metrics;
                         return _this.filterMetrics(metrics, query);
                     });
