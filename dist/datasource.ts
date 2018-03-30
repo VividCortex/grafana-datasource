@@ -3,13 +3,11 @@
 import _ from 'lodash';
 
 export default class VividCortexMetricsDatasource {
-  org: string;
   apiToken: string;
   metrics: Array<any>;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
-    this.org = instanceSettings.jsonData.org;
     this.apiToken = instanceSettings.jsonData.apiToken;
   }
 
@@ -35,7 +33,7 @@ export default class VividCortexMetricsDatasource {
       .then(response => ({ metrics: response.data.data || [], from: parseInt(response.headers('X-Vc-Meta-From')), until: parseInt(response.headers('X-Vc-Meta-Until')) }))
       .then(response => {
         return this.mapQueryResponse(response.metrics, response.from, response.until);
-      })
+      });
   }
 
   annotationQuery(options) {
@@ -52,7 +50,6 @@ export default class VividCortexMetricsDatasource {
       .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
       .then(metrics => metrics.sort((a, b) => a.text === b.text ? 0 : (a.text > b.text ? 1 : -1)))
       .then(metrics => {
-        console.warn(metrics);
         this.metrics = metrics;
 
         return this.filterMetrics(metrics, query);
@@ -97,7 +94,7 @@ export default class VividCortexMetricsDatasource {
         'Authorization': 'Bearer '+this.apiToken,
       },
       params: params,
-      url: 'https://'+this.org+'.app.vividcortex.com/api/v2/'+endpoint,
+      url: 'https://app.vividcortex.com/api/v2/'+endpoint,
       method: method,
       data: body,
     };

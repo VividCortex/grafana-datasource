@@ -3,7 +3,6 @@ export default class VividCortexMetricsDatasource {
     private backendSrv;
     private templateSrv;
     private $q;
-    org: string;
     apiToken: string;
     metrics: Array<any>;
     /** @ngInject */

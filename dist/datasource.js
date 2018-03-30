@@ -10,7 +10,6 @@ System.register([], function(exports_1) {
                     this.backendSrv = backendSrv;
                     this.templateSrv = templateSrv;
                     this.$q = $q;
-                    this.org = instanceSettings.jsonData.org;
                     this.apiToken = instanceSettings.jsonData.apiToken;
                 }
                 VividCortexMetricsDatasource.prototype.query = function (options) {
@@ -47,7 +46,6 @@ System.register([], function(exports_1) {
                         .then(function (metrics) { return metrics.map(function (metric) { return ({ text: metric.name, value: metric.name }); }); })
                         .then(function (metrics) { return metrics.sort(function (a, b) { return a.text === b.text ? 0 : (a.text > b.text ? 1 : -1); }); })
                         .then(function (metrics) {
-                        console.warn(metrics);
                         _this.metrics = metrics;
                         return _this.filterMetrics(metrics, query);
                     });
@@ -90,7 +88,7 @@ System.register([], function(exports_1) {
                             'Authorization': 'Bearer ' + this.apiToken,
                         },
                         params: params,
-                        url: 'https://' + this.org + '.app.vividcortex.com/api/v2/' + endpoint,
+                        url: 'https://app.vividcortex.com/api/v2/' + endpoint,
                         method: method,
                         data: body,
                     };
