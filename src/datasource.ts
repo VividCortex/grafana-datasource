@@ -3,13 +3,11 @@
 import _ from 'lodash';
 
 export default class VividCortexMetricsDatasource {
-  org: string;
   apiToken: string;
   metrics: Array<any>;
 
   /** @ngInject */
   constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
-    this.org = instanceSettings.jsonData.org;
     this.apiToken = instanceSettings.jsonData.apiToken;
   }
 
@@ -96,7 +94,7 @@ export default class VividCortexMetricsDatasource {
         'Authorization': 'Bearer '+this.apiToken,
       },
       params: params,
-      url: 'https://'+this.org+'.app.vividcortex.com/api/v2/'+endpoint,
+      url: 'https://app.vividcortex.com/api/v2/'+endpoint,
       method: method,
       data: body,
     };
