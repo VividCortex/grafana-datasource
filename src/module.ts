@@ -1,6 +1,6 @@
 import VividCortexMetricsDatasource from './datasource';
-import {VividCortexMetricsQueryCtrl} from './query_ctrl';
-import {VividCortexMetricsConfigCtrl} from './config_ctrl';
+import { VividCortexMetricsQueryCtrl } from './query_ctrl';
+import { VividCortexMetricsConfigCtrl } from './config_ctrl';
 
 class VividCortexMetricsAnnotationsQueryCtrl {
   static templateUrl = 'partials/annotations.editor.html';

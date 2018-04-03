@@ -1,5 +1,5 @@
-import {describe, beforeEach, it, sinon, expect} from './lib/common';
-import {VividCortexMetricsQueryCtrl} from '../src/query_ctrl';
+import { describe, beforeEach, it, sinon, expect } from './lib/common';
+import { VividCortexMetricsQueryCtrl } from '../src/query_ctrl';
 import TemplateSrvStub from './lib/template_srv_stub';
 import Q from 'q';
 import moment from 'moment';
@@ -9,7 +9,7 @@ describe('VividCortexMetricsQueryCtrl', function() {
 
   beforeEach(function() {
     queryCtrl = new VividCortexMetricsQueryCtrl({}, {}, new TemplateSrvStub());
-    queryCtrl.datasource = {$q: Q};
+    queryCtrl.datasource = { $q: Q };
   });
 
   describe('init query_ctrl variables', function() {

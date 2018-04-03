@@ -1,4 +1,4 @@
-import {describe, beforeEach, it, sinon, expect, angularMocks} from './lib/common';
+import { describe, beforeEach, it, sinon, expect, angularMocks } from './lib/common';
 import VividCortexMetricsDatasource from '../src/datasource';
 import TemplateSrvStub from './lib/template_srv_stub';
 import Q from 'q';
@@ -7,7 +7,7 @@ import moment from 'moment';
 describe('VividCortexMetricsDatasource', function() {
   let ctx: any = {
     backendSrv: {},
-    templateSrv: new TemplateSrvStub()
+    templateSrv: new TemplateSrvStub(),
   };
 
   beforeEach(function() {
@@ -23,11 +23,11 @@ describe('VividCortexMetricsDatasource', function() {
         data: {
           error: {
             code: 'Error Code',
-            message: `An error message.`
-          }
+            message: `An error message.`,
+          },
         },
         status: 400,
-        statusText: 'Bad Request'
+        statusText: 'Bad Request',
       };
 
       beforeEach(function() {
@@ -46,15 +46,14 @@ describe('VividCortexMetricsDatasource', function() {
 
     describe('and the response works', function() {
       const response = {
-        data: {
-        },
+        data: {},
         status: 200,
-        statusText: 'OK'
+        statusText: 'OK',
       };
 
       beforeEach(function() {
         ctx.backendSrv.datasourceRequest = function(options) {
-          return ctx.$q.when({data: response, status: 200});
+          return ctx.$q.when({ data: response, status: 200 });
         };
       });
 
@@ -66,6 +65,5 @@ describe('VividCortexMetricsDatasource', function() {
     });
   });
 
-  describe('When performing query', function() {
-  });
+  describe('When performing query', function() {});
 });

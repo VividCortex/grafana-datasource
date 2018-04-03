@@ -14,16 +14,14 @@
       "small": "img/vividcortex.svg",
       "large": "img/vividcortex.svg"
     },
-    "links": [
-      {"name": "VividCortex", "url": "https://github.com/vividcortex/grafana-metrics-datasource"}
-    ],
+    "links": [{ "name": "VividCortex", "url": "https://github.com/vividcortex/grafana-metrics-datasource" }],
     "version": "0.0.1",
     "updated": "2018-03-14"
   },
 
   "dependencies": {
     "grafanaVersion": "4.5.x",
-    "plugins": [ ]
+    "plugins": []
   },
 
   "metrics": true,

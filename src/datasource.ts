@@ -14,8 +14,8 @@ export default class VividCortexMetricsDatasource {
   query(options) {
     const parameters = this.getQueryParameters(options);
 
-    if (! parameters) {
-      return this.$q.when({data: []});
+    if (!parameters) {
+      return this.$q.when({ data: [] });
     }
 
     const params = {
@@ -30,7 +30,11 @@ export default class VividCortexMetricsDatasource {
     };
 
     return this.doRequest('metrics/query-series', 'POST', params, body)
-      .then(response => ({ metrics: response.data.data || [], from: parseInt(response.headers('X-Vc-Meta-From')), until: parseInt(response.headers('X-Vc-Meta-Until')) }))
+      .then(response => ({
+        metrics: response.data.data || [],
+        from: parseInt(response.headers('X-Vc-Meta-From')),
+        until: parseInt(response.headers('X-Vc-Meta-Until')),
+      }))
       .then(response => {
         return this.mapQueryResponse(response.metrics, response.from, response.until);
       });
@@ -48,7 +52,7 @@ export default class VividCortexMetricsDatasource {
     return this.doRequest('metrics', 'GET')
       .then(response => response.data.data || [])
       .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
-      .then(metrics => metrics.sort((a, b) => a.text === b.text ? 0 : (a.text > b.text ? 1 : -1)))
+      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)))
       .then(metrics => {
         this.metrics = metrics;
 
@@ -58,24 +62,27 @@ export default class VividCortexMetricsDatasource {
 
   testDatasource() {
     const success = {
-      status: 'success',
-      message: 'Your VividCortex datasource was successfully configured.',
-      title: 'Success'
-    }, error = {
-      status: 'error',
-      message: 'The API token or organization name are incorrect.',
-      title: 'Credentials error'
-    };
+        status: 'success',
+        message: 'Your VividCortex datasource was successfully configured.',
+        title: 'Success',
+      },
+      error = {
+        status: 'error',
+        message: 'The API token or organization name are incorrect.',
+        title: 'Credentials error',
+      };
 
-    return this.doRequest('metrics', 'GET', { limit: 1 })
-      .then(response => {
+    return this.doRequest('metrics', 'GET', { limit: 1 }).then(
+      response => {
         if (response.status === 200) {
           return success;
         }
-        return error
-      }, () => {
         return error;
-      });
+      },
+      () => {
+        return error;
+      }
+    );
   }
 
   /**
@@ -91,10 +98,10 @@ export default class VividCortexMetricsDatasource {
     const options = {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer '+this.apiToken,
+        Authorization: 'Bearer ' + this.apiToken,
       },
       params: params,
-      url: 'https://app.vividcortex.com/api/v2/'+endpoint,
+      url: 'https://app.vividcortex.com/api/v2/' + endpoint,
       method: method,
       data: body,
     };
@@ -118,14 +125,16 @@ export default class VividCortexMetricsDatasource {
       return target.target != 'select metric' ? target.hosts : hosts;
     }, null);
 
-    if (!metric) { return null; }
+    if (!metric) {
+      return null;
+    }
 
     return {
       metric: metric,
-      hosts: '0,'+hosts,
+      hosts: '0,' + hosts,
       params: {
         from: options.range.from.unix(),
-        until: options.range.to.unix()
+        until: options.range.to.unix(),
       },
     };
   }
@@ -138,25 +147,27 @@ export default class VividCortexMetricsDatasource {
    * @param  {number} until
    * @return {Array}
    */
-   mapQueryResponse(series: Array<any>, from: number, until: number) {
-     if (! series.length || !series[0].elements.length) {
-       return { data: [] };
-     }
+  mapQueryResponse(series: Array<any>, from: number, until: number) {
+    if (!series.length || !series[0].elements.length) {
+      return { data: [] };
+    }
 
-     const values = series[0].elements[0].series;
-     const sampleSize = (until - from) / (values.length);
+    const values = series[0].elements[0].series;
+    const sampleSize = (until - from) / values.length;
 
-     const response = {
-       data: [{
-         target: series[0].elements[0].metric,
-         datapoints: values.map((value, index) => {
-             return [value, (from + index * sampleSize) * 1e3];
-         })
-       }]
-     };
+    const response = {
+      data: [
+        {
+          target: series[0].elements[0].metric,
+          datapoints: values.map((value, index) => {
+            return [value, (from + index * sampleSize) * 1e3];
+          }),
+        },
+      ],
+    };
 
-     return response;
-   }
+    return response;
+  }
 
   /**
    * Filters the metrics that matches the query string.
@@ -166,6 +177,6 @@ export default class VividCortexMetricsDatasource {
    * @return {Array}
    */
   filterMetrics(metrics: Array<any>, query: string) {
-    return metrics.filter(metric => metric.text.indexOf(query) > -1)
+    return metrics.filter(metric => metric.text.indexOf(query) > -1);
   }
 }

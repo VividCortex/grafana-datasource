@@ -13,35 +13,35 @@ module.exports = function(grunt) {
         expand: true,
         cwd: 'src',
         src: ['**/*.ts', '**/*.d.ts'],
-        dest: 'dist'
+        dest: 'dist',
       },
       dist_html: {
         expand: true,
         flatten: true,
         cwd: 'src/partials',
         src: ['*.html'],
-        dest: 'dist/partials/'
+        dest: 'dist/partials/',
       },
       dist_css: {
         expand: true,
         flatten: true,
         cwd: 'src/css',
         src: ['*.css'],
-        dest: 'dist/css/'
+        dest: 'dist/css/',
       },
       dist_img: {
         expand: true,
         flatten: true,
         cwd: 'src/img',
         src: ['*.*'],
-        dest: 'dist/img/'
+        dest: 'dist/img/',
       },
       dist_statics: {
         expand: true,
         flatten: true,
         src: ['src/plugin.json', 'LICENSE', 'README.md'],
-        dest: 'dist/'
-      }
+        dest: 'dist/',
+      },
     },
 
     typescript: {
@@ -57,8 +57,8 @@ module.exports = function(grunt) {
           experimentalDecorators: true,
           sourceMap: true,
           noImplicitAny: false,
-        }
-      }
+        },
+      },
     },
 
     watch: {
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
       options: {
         debounceDelay: 250,
       },
-    }
+    },
   });
 
   grunt.registerTask('default', [
@@ -77,6 +77,6 @@ module.exports = function(grunt) {
     'copy:dist_html',
     'copy:dist_css',
     'copy:dist_img',
-    'copy:dist_statics'
+    'copy:dist_statics',
   ]);
 };
