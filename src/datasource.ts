@@ -2,14 +2,14 @@
 export default class VividCortexMetricsDatasource {
   apiToken: string;
   metrics: Array<any>;
-  backendSrv;
-  templateSrv;
+  $q;
 
   /** @ngInject */
-  constructor(instanceSettings, private backendSrv, private templateSrv) {
+  constructor(instanceSettings, private backendSrv, private templateSrv, $q) {
     this.apiToken = instanceSettings.jsonData.apiToken;
     this.backendSrv = backendSrv;
     this.templateSrv = templateSrv;
+    this.$q = $q;
   }
 
   query(options) {

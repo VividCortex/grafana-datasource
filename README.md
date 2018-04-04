@@ -14,3 +14,11 @@ Inside your VivivCortex account, go to Settings, Api Tokens and generate a new o
 1.  Place this project in your plugins directory or _<grafana folder>/data/plugins_
 2.  Install dependencies. `yarn install` or `npm install`
 3.  Build to distribute. `yarn grunt` or `npm run grunt`
+
+### Coding style
+
+The code is automatically formatted using Prettier in a pre-commit script.
+
+### Code linting
+
+Run the linter with `yarn lint` or `npm run lint`.
