@@ -4,5 +4,5 @@ export class VividCortexMetricsConfigCtrl {
   static templateUrl = 'partials/config.html';
   current: any;
 
-  constructor($scope) {}
+  constructor() {}
 }

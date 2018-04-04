@@ -1,14 +1,15 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
-
-import _ from 'lodash';
-
 export default class VividCortexMetricsDatasource {
   apiToken: string;
   metrics: Array<any>;
+  backendSrv;
+  templateSrv;
 
   /** @ngInject */
-  constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
+  constructor(instanceSettings, private backendSrv, private templateSrv) {
     this.apiToken = instanceSettings.jsonData.apiToken;
+    this.backendSrv = backendSrv;
+    this.templateSrv = templateSrv;
   }
 
   query(options) {
@@ -118,11 +119,11 @@ export default class VividCortexMetricsDatasource {
    */
   getQueryParameters(options) {
     const metric = options.targets.reduce((metric, target) => {
-      return target.target != 'select metric' ? target.target : metric;
+      return target.target !== 'select metric' ? target.target : metric;
     }, null);
 
     const hosts = options.targets.reduce((hosts, target) => {
-      return target.target != 'select metric' ? target.hosts : hosts;
+      return target.target !== 'select metric' ? target.hosts : hosts;
     }, null);
 
     if (!metric) {
