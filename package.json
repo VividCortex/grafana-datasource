@@ -6,7 +6,8 @@
     "build": "grunt",
     "watch": "grunt watch",
     "test": "./node_modules/karma/bin/karma start",
-    "precommit": "pretty-quick --staged"
+    "precommit": "pretty-quick --staged",
+    "lint": "yarn eslint src/**/*.ts"
   },
   "author": "VividCortex",
   "license": "MIT",
