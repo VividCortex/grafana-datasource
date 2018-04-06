@@ -153,19 +153,21 @@ export default class VividCortexMetricsDatasource {
       return { data: [] };
     }
 
-    const values = series[0].elements[0].series;
-    const sampleSize = (until - from) / values.length;
-
     const response = {
-      data: [
-        {
-          target: series[0].elements[0].metric,
-          datapoints: values.map((value, index) => {
-            return [value, (from + index * sampleSize) * 1e3];
-          }),
-        },
-      ],
+      data: [],
     };
+
+    response.data = series[0].elements.map(element => {
+      const values = element.series;
+      const sampleSize = (until - from) / values.length;
+
+      return {
+        target: element.metric,
+        datapoints: values.map((value, index) => {
+          return [value, (from + index * sampleSize) * 1e3];
+        }),
+      };
+    });
 
     return response;
   }
@@ -178,6 +180,8 @@ export default class VividCortexMetricsDatasource {
    * @return {Array}
    */
   filterMetrics(metrics: Array<any>, query: string) {
-    return metrics.filter(metric => metric.text.indexOf(query) > -1);
+    const regexQuery = new RegExp(query.replace(/\*/g, '[a-zA-Z0-9-]*'));
+
+    return metrics.filter(metric => regexQuery.test(metric.text));
   }
 }
