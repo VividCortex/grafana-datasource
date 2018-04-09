@@ -1,0 +1,188 @@
+///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
+export default class VividCortexMetricsDatasource {
+  apiToken: string;
+  metrics: Array<any>;
+  $q;
+
+  /** @ngInject */
+  constructor(instanceSettings, private backendSrv, private templateSrv, $q) {
+    this.apiToken = instanceSettings.jsonData.apiToken;
+    this.backendSrv = backendSrv;
+    this.templateSrv = templateSrv;
+    this.$q = $q;
+  }
+
+  query(options) {
+    const parameters = this.getQueryParameters(options);
+
+    if (!parameters) {
+      return this.$q.when({ data: [] });
+    }
+
+    const params = {
+      from: parameters.params.from,
+      samplesize: 12,
+      until: parameters.params.until,
+      host: parameters.hosts,
+    };
+
+    const body = {
+      metrics: parameters.metric,
+    };
+
+    return this.doRequest('metrics/query-series', 'POST', params, body)
+      .then(response => ({
+        metrics: response.data.data || [],
+        from: parseInt(response.headers('X-Vc-Meta-From')),
+        until: parseInt(response.headers('X-Vc-Meta-Until')),
+      }))
+      .then(response => {
+        return this.mapQueryResponse(response.metrics, response.from, response.until);
+      });
+  }
+
+  annotationQuery(options) {
+    throw new Error('Annotation support not implemented yet.');
+  }
+
+  metricFindQuery(query: string) {
+    if (this.metrics) {
+      return this.filterMetrics(this.metrics, query);
+    }
+
+    return this.doRequest('metrics', 'GET')
+      .then(response => response.data.data || [])
+      .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
+      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)))
+      .then(metrics => {
+        this.metrics = metrics;
+
+        return this.filterMetrics(metrics, query);
+      });
+  }
+
+  testDatasource() {
+    const success = {
+        status: 'success',
+        message: 'Your VividCortex datasource was successfully configured.',
+        title: 'Success',
+      },
+      error = {
+        status: 'error',
+        message:
+          'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
+        title: 'Credentials error',
+      };
+
+    return this.doRequest('metrics', 'GET', { limit: 1 }).then(
+      response => {
+        if (response.status === 200) {
+          return success;
+        }
+        return error;
+      },
+      () => {
+        return error;
+      }
+    );
+  }
+
+  /**
+   * Perform an HTTP request.
+   *
+   * @param  {string} endpoint
+   * @param  {string} method
+   * @param  {Object} params
+   * @param  {Object} body
+   * @return {Promise}
+   */
+  doRequest(endpoint, method, params = {}, body = {}) {
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.apiToken,
+      },
+      params: params,
+      url: 'https://app.vividcortex.com/api/v2/' + endpoint,
+      method: method,
+      data: body,
+    };
+
+    return this.backendSrv.datasourceRequest(options);
+  }
+
+  /**
+   * Takes a Grafana query object and returns an object with the required information to query
+   * VividCortex, or null if there is an error or no selected metrics.
+   *
+   * @param  {Object} options Grafana options object
+   * @return {Object|null}
+   */
+  getQueryParameters(options) {
+    const metric = options.targets.reduce((metric, target) => {
+      return target.target !== 'select metric' ? target.target : metric;
+    }, null);
+
+    const hosts = options.targets.reduce((hosts, target) => {
+      return target.target !== 'select metric' ? target.hosts : hosts;
+    }, null);
+
+    if (!metric) {
+      return null;
+    }
+
+    return {
+      metric: metric,
+      hosts: '0,' + hosts,
+      params: {
+        from: options.range.from.unix(),
+        until: options.range.to.unix(),
+      },
+    };
+  }
+
+  /**
+   * Maps a VividCortex series response to Grafana's structure.
+   *
+   * @param  {Array} series
+   * @param  {number} from
+   * @param  {number} until
+   * @return {Array}
+   */
+  mapQueryResponse(series: Array<any>, from: number, until: number) {
+    if (!series.length || !series[0].elements.length) {
+      return { data: [] };
+    }
+
+    const response = {
+      data: [],
+    };
+
+    response.data = series[0].elements.map(element => {
+      const values = element.series;
+      const sampleSize = (until - from) / values.length;
+
+      return {
+        target: element.metric,
+        datapoints: values.map((value, index) => {
+          return [value, (from + index * sampleSize) * 1e3];
+        }),
+      };
+    });
+
+    return response;
+  }
+
+  /**
+   * Filters the metrics that matches the query string.
+   *
+   * @param  {Array} metrics
+   * @param  {string} query
+   * @return {Array}
+   */
+  filterMetrics(metrics: Array<any>, query: string) {
+    const regexQuery = new RegExp(query.replace(/\*/g, '[a-zA-Z0-9-]*'));
+
+    return metrics.filter(metric => regexQuery.test(metric.text));
+  }
+}
