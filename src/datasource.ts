@@ -69,7 +69,8 @@ export default class VividCortexMetricsDatasource {
       },
       error = {
         status: 'error',
-        message: 'The API token or organization name are incorrect.',
+        message:
+          'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
         title: 'Credentials error',
       };
 
