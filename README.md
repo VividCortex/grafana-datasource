@@ -7,7 +7,7 @@ Login to Grafana and go to **Configuration** > **Data Sources** > **Add data sou
 
 ## Generating an API Token
 
-Inside your VivivCortex account, go to Settings, Api Tokens and generate a new one.
+In your VivivCortex dashboard, go to Settings, Api Tokens and generate a new one.
 
 ## Development guide
 
