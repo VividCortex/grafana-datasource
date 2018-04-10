@@ -1,7 +1,6 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
 export default class VividCortexMetricsDatasource {
   apiToken: string;
-  metrics: Array<any>;
   $q;
 
   /** @ngInject */
@@ -46,19 +45,13 @@ export default class VividCortexMetricsDatasource {
   }
 
   metricFindQuery(query: string) {
-    if (this.metrics) {
-      return this.filterMetrics(this.metrics, query);
-    }
+    const params = {
+      q: query,
+    };
 
-    return this.doRequest('metrics', 'GET')
+    return this.doRequest('metrics/search', 'GET', params)
       .then(response => response.data.data || [])
-      .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
-      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)))
-      .then(metrics => {
-        this.metrics = metrics;
-
-        return this.filterMetrics(metrics, query);
-      });
+      .then(metrics => metrics.map(metric => ({ text: metric, value: metric })));
   }
 
   testDatasource() {
@@ -171,18 +164,5 @@ export default class VividCortexMetricsDatasource {
     });
 
     return response;
-  }
-
-  /**
-   * Filters the metrics that matches the query string.
-   *
-   * @param  {Array} metrics
-   * @param  {string} query
-   * @return {Array}
-   */
-  filterMetrics(metrics: Array<any>, query: string) {
-    const regexQuery = new RegExp(query.replace(/\*/g, '[a-zA-Z0-9-]*'));
-
-    return metrics.filter(metric => regexQuery.test(metric.text));
   }
 }
