@@ -135,13 +135,30 @@ export default class VividCortexMetricsDatasource {
     }
 
     return {
-      metric: this.interpolateVariables(metric),
+      metric: this.transformMetricForQuery(this.interpolateVariables(metric)),
       hosts: '0,' + hosts,
       params: {
         from: options.range.from.unix(),
         until: options.range.to.unix(),
       },
     };
+  }
+
+  /**
+   * Prepares the metric to be properly interpreted by the API. E.g. if Grafana is using template
+   * variables and requesting multiple metrics.
+   *
+   * @param  {string} metric
+   * @return {string}
+   */
+  transformMetricForQuery(metric: string) {
+    const metrics = metric.replace(/[()]/g, '').split('|');
+
+    if (metrics.length < 2) {
+      return metric;
+    }
+
+    return metrics.join(',');
   }
 
   /**
@@ -161,16 +178,18 @@ export default class VividCortexMetricsDatasource {
       data: [],
     };
 
-    response.data = series[0].elements.map(element => {
-      const values = element.series;
-      const sampleSize = (until - from) / values.length;
+    series.forEach(serie => {
+      serie.elements.forEach(element => {
+        const values = element.series;
+        const sampleSize = (until - from) / values.length;
 
-      return {
-        target: element.metric,
-        datapoints: values.map((value, index) => {
-          return [value, (from + index * sampleSize) * 1e3];
-        }),
-      };
+        response.data.push({
+          target: element.metric,
+          datapoints: values.map((value, index) => {
+            return [value, (from + index * sampleSize) * 1e3];
+          }),
+        });
+      });
     });
 
     return response;
