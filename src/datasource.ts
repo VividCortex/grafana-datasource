@@ -46,7 +46,7 @@ export default class VividCortexMetricsDatasource {
 
   metricFindQuery(query: string) {
     const params = {
-      q: query,
+      q: this.interpolateVariables(query),
     };
 
     return this.doRequest('metrics/search', 'GET', params)
@@ -78,6 +78,16 @@ export default class VividCortexMetricsDatasource {
         return error;
       }
     );
+  }
+
+  /**
+   * Interpolate Grafana variables and strip scape characters.
+   *
+   * @param  {string} metric
+   * @return {string}
+   */
+  interpolateVariables(metric: string) {
+    return this.templateSrv.replace(metric, null, 'regex').replace(/\\\./g, '.');
   }
 
   /**
@@ -125,7 +135,7 @@ export default class VividCortexMetricsDatasource {
     }
 
     return {
-      metric: metric,
+      metric: this.interpolateVariables(metric),
       hosts: '0,' + hosts,
       params: {
         from: options.range.from.unix(),
