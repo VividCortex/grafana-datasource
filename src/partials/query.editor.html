@@ -15,7 +15,15 @@
           on-change="ctrl.onChangeInternal()">
         </gf-form-dropdown>
 
-        <input class="gf-form-input width-30" type="text" ng-model="ctrl.target.hosts" placeholder="Comma separated host ids"></input>
+        <input class="gf-form-input width-30" type="text" ng-model="ctrl.target.hosts" placeholder="Filter your hosts by name or type" />
+
+        <info-popover mode="right-absolute">
+            <ul>
+              <li>You can match hostnames exactly by wrapping them with the double quotes sign. The string "api2", for example, will match a host named api2 but not one named api20.</li>
+              <li>You can exclude hosts from the selection by negating them with a minus sign. For example, -"api20".</li>
+              <li>You can select hosts by their type (os, mysql, pgsql, redis and mongo at present), with syntax such as type=os or type=mysql.</li>
+            </ul>
+        </info-popover>
       </div>
       <div class="gf-form gf-form--grow">
         <div class="gf-form-label gf-form-label--grow"></div>

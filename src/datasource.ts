@@ -22,22 +22,36 @@ export default class VividCortexMetricsDatasource {
       from: parameters.params.from,
       samplesize: 12,
       until: parameters.params.until,
-      host: parameters.hosts,
+      host: null,
     };
 
     const body = {
       metrics: parameters.metric,
     };
 
-    return this.doRequest('metrics/query-series', 'POST', params, body)
-      .then(response => ({
-        metrics: response.data.data || [],
-        from: parseInt(response.headers('X-Vc-Meta-From')),
-        until: parseInt(response.headers('X-Vc-Meta-Until')),
-      }))
-      .then(response => {
-        return this.mapQueryResponse(response.metrics, response.from, response.until);
-      });
+    const defer = this.$q.defer();
+
+    this.doRequest('hosts', 'GET', {
+      from: parameters.params.from,
+      until: parameters.params.until,
+    }).then(response => {
+      params.host = this.filterHosts(response.data.data, options);
+
+      this.doRequest('metrics/query-series', 'POST', params, body)
+        .then(response => ({
+          metrics: response.data.data || [],
+          from: parseInt(response.headers('X-Vc-Meta-From')),
+          until: parseInt(response.headers('X-Vc-Meta-Until')),
+        }))
+        .then(response => {
+          defer.resolve(this.mapQueryResponse(response.metrics, response.from, response.until));
+        })
+        .catch(error => {
+          defer.reject(error);
+        });
+    });
+
+    return defer.promise;
   }
 
   annotationQuery(options) {
@@ -126,22 +140,40 @@ export default class VividCortexMetricsDatasource {
       return target.target !== 'select metric' ? target.target : metric;
     }, null);
 
-    const hosts = options.targets.reduce((hosts, target) => {
-      return target.target !== 'select metric' ? target.hosts : hosts;
-    }, null);
-
     if (!metric) {
       return null;
     }
 
     return {
       metric: this.transformMetricForQuery(this.interpolateVariables(metric)),
-      hosts: '0,' + hosts,
       params: {
         from: options.range.from.unix(),
         until: options.range.to.unix(),
       },
     };
+  }
+
+  filterHosts(hosts, options) {
+    const config = options.targets.reduce((hosts, target) => {
+      return target.target !== 'select metric' ? target.hosts : hosts;
+    }, '');
+
+    const filters = config.split(' ');
+
+    const filteredHosts = hosts.filter(host => {
+      return filters.reduce((included, filter) => {
+        if (!filter) {
+          return true;
+        } //include all the hosts by default
+
+        const keyValue = filter.split('=');
+
+        // filter === name || host[key] === value
+        return included && (keyValue.length === 1 ? filter === host.name : host[keyValue[0]] === keyValue[1]);
+      }, true);
+    });
+
+    return filteredHosts.map(host => host.id).join(',');
   }
 
   /**
