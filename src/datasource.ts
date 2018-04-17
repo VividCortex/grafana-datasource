@@ -11,63 +11,6 @@ export default class VividCortexMetricsDatasource {
     this.$q = $q;
   }
 
-  query(options) {
-    const parameters = this.getQueryParameters(options);
-
-    if (!parameters) {
-      return this.$q.when({ data: [] });
-    }
-
-    const params = {
-      from: parameters.params.from,
-      samplesize: 12,
-      until: parameters.params.until,
-      host: null,
-    };
-
-    const body = {
-      metrics: parameters.metric,
-    };
-
-    const defer = this.$q.defer();
-
-    this.doRequest('hosts', 'GET', {
-      from: parameters.params.from,
-      until: parameters.params.until,
-    }).then(response => {
-      params.host = this.filterHosts(response.data.data, options);
-
-      this.doRequest('metrics/query-series', 'POST', params, body)
-        .then(response => ({
-          metrics: response.data.data || [],
-          from: parseInt(response.headers('X-Vc-Meta-From')),
-          until: parseInt(response.headers('X-Vc-Meta-Until')),
-        }))
-        .then(response => {
-          defer.resolve(this.mapQueryResponse(response.metrics, response.from, response.until));
-        })
-        .catch(error => {
-          defer.reject(error);
-        });
-    });
-
-    return defer.promise;
-  }
-
-  annotationQuery(options) {
-    throw new Error('Annotation support not implemented yet.');
-  }
-
-  metricFindQuery(query: string) {
-    const params = {
-      q: this.interpolateVariables(query),
-    };
-
-    return this.doRequest('metrics/search', 'GET', params)
-      .then(response => response.data.data || [])
-      .then(metrics => metrics.map(metric => ({ text: metric, value: metric })));
-  }
-
   testDatasource() {
     const success = {
         status: 'success',
@@ -92,6 +35,87 @@ export default class VividCortexMetricsDatasource {
         return error;
       }
     );
+  }
+
+  annotationQuery(options) {
+    throw new Error('Annotation support not implemented yet.');
+  }
+
+  metricFindQuery(query: string) {
+    const params = {
+      q: this.interpolateVariables(query),
+    };
+
+    return this.doRequest('metrics/search', 'GET', params)
+      .then(response => response.data.data || [])
+      .then(metrics => metrics.map(metric => ({ text: metric, value: metric })));
+  }
+
+  query(options) {
+    if (options.targets.length === 0) {
+      return this.$q.when({ data: [] });
+    }
+
+    const defer = this.$q.defer();
+
+    const promises = options.targets.map(target => {
+      return this.doQuery(target, options.range.from.unix(), options.range.to.unix());
+    });
+
+    this.$q.all(promises).then(function(responses) {
+      const result = responses.reduce((result, response) => result.concat(response.data), []);
+
+      defer.resolve({ data: result });
+    });
+
+    return defer.promise;
+  }
+
+  /* Custom methods ----------------------------------------------------------------------------- */
+
+  /**
+   * Perform a query-series query for a given target (host and metric) in a time frame.
+   *
+   * @param  {object} target
+   * @param  {number} from
+   * @param  {number} until
+   * @return {Promise}
+   */
+  doQuery(target: any, from: number, until: number) {
+    const params = {
+      from: from,
+      samplesize: 12,
+      until: until,
+      host: null,
+    };
+
+    const body = {
+      metrics: this.transformMetricForQuery(this.interpolateVariables(target.target)),
+    };
+
+    const defer = this.$q.defer();
+
+    this.doRequest('hosts', 'GET', {
+      from: from,
+      until: until,
+    }).then(response => {
+      params.host = this.filterHosts(response.data.data, target.hosts);
+
+      this.doRequest('metrics/query-series', 'POST', params, body)
+        .then(response => ({
+          metrics: response.data.data || [],
+          from: parseInt(response.headers('X-Vc-Meta-From')),
+          until: parseInt(response.headers('X-Vc-Meta-Until')),
+        }))
+        .then(response => {
+          defer.resolve(this.mapQueryResponse(response.metrics, response.from, response.until));
+        })
+        .catch(error => {
+          defer.reject(error);
+        });
+    });
+
+    return defer.promise;
   }
 
   /**
@@ -129,35 +153,13 @@ export default class VividCortexMetricsDatasource {
   }
 
   /**
-   * Takes a Grafana query object and returns an object with the required information to query
-   * VividCortex, or null if there is an error or no selected metrics.
+   * Take an array of hosts and apply the configured filters.
    *
-   * @param  {Object} options Grafana options object
-   * @return {Object|null}
+   * @param  {Array}  hosts
+   * @param  {object} config
+   * @return {Array}
    */
-  getQueryParameters(options) {
-    const metric = options.targets.reduce((metric, target) => {
-      return target.target !== 'select metric' ? target.target : metric;
-    }, null);
-
-    if (!metric) {
-      return null;
-    }
-
-    return {
-      metric: this.transformMetricForQuery(this.interpolateVariables(metric)),
-      params: {
-        from: options.range.from.unix(),
-        until: options.range.to.unix(),
-      },
-    };
-  }
-
-  filterHosts(hosts, options) {
-    const config = options.targets.reduce((hosts, target) => {
-      return target.target !== 'select metric' ? target.hosts : hosts;
-    }, '');
-
+  filterHosts(hosts: Array<any>, config: any) {
     const filters = config.split(' ');
 
     const filteredHosts = hosts.filter(host => {
@@ -177,7 +179,7 @@ export default class VividCortexMetricsDatasource {
   }
 
   /**
-   * Prepares the metric to be properly interpreted by the API. E.g. if Grafana is using template
+   * Prepare the metric to be properly interpreted by the API. E.g. if Grafana is using template
    * variables and requesting multiple metrics.
    *
    * @param  {string} metric
@@ -194,7 +196,7 @@ export default class VividCortexMetricsDatasource {
   }
 
   /**
-   * Maps a VividCortex series response to Grafana's structure.
+   * Map a VividCortex series response to Grafana's structure.
    *
    * @param  {Array} series
    * @param  {number} from
