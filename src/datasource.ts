@@ -1,4 +1,6 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
+import { parseFilters, testHost } from './lib/filters';
+
 export default class VividCortexMetricsDatasource {
   apiToken: string;
   $q;
@@ -160,22 +162,12 @@ export default class VividCortexMetricsDatasource {
    * @return {Array}
    */
   filterHosts(hosts: Array<any>, config: any) {
-    const filters = config.split(' ');
+    const filters = parseFilters(config);
 
-    const filteredHosts = hosts.filter(host => {
-      return filters.reduce((included, filter) => {
-        if (!filter) {
-          return true;
-        } //include all the hosts by default
-
-        const keyValue = filter.split('=');
-
-        // filter === name || host[key] === value
-        return included && (keyValue.length === 1 ? filter === host.name : host[keyValue[0]] === keyValue[1]);
-      }, true);
-    });
-
-    return filteredHosts.map(host => host.id).join(',');
+    return hosts
+      .filter(host => testHost(host, filters))
+      .map(host => host.id)
+      .join(',');
   }
 
   /**
