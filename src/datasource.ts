@@ -64,11 +64,16 @@ export default class VividCortexMetricsDatasource {
       return this.doQuery(target, options.range.from.unix(), options.range.to.unix());
     });
 
-    this.$q.all(promises).then(function(responses) {
-      const result = responses.reduce((result, response) => result.concat(response.data), []);
+    this.$q
+      .all(promises)
+      .then(function(responses) {
+        const result = responses.reduce((result, response) => result.concat(response.data), []);
 
-      defer.resolve({ data: result });
-    });
+        defer.resolve({ data: result });
+      })
+      .catch(error => {
+        defer.reject(error);
+      });
 
     return defer.promise;
   }
