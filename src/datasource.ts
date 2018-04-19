@@ -58,24 +58,15 @@ export default class VividCortexMetricsDatasource {
       return this.$q.when({ data: [] });
     }
 
-    const defer = this.$q.defer();
-
     const promises = options.targets.map(target => {
       return this.doQuery(target, options.range.from.unix(), options.range.to.unix());
     });
 
-    this.$q
-      .all(promises)
-      .then(function(responses) {
-        const result = responses.reduce((result, response) => result.concat(response.data), []);
+    return this.$q.all(promises).then(function(responses) {
+      const result = responses.reduce((result, response) => result.concat(response.data), []);
 
-        defer.resolve({ data: result });
-      })
-      .catch(error => {
-        defer.reject(error);
-      });
-
-    return defer.promise;
+      return { data: result };
+    });
   }
 
   /* Custom methods ----------------------------------------------------------------------------- */
