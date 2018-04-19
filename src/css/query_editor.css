@@ -17,3 +17,7 @@
 .gf-form-select-wrapper--caret-indent.gf-form-select-wrapper::after {
   right: 0.775rem;
 }
+
+.vc-learn-more__link {
+  text-decoration: underline;
+}
