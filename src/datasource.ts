@@ -1,7 +1,7 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
 import { parseFilters, testHost } from './lib/filters';
 
-export default class VividCortexMetricsDatasource {
+export default class VividCortexDatasource {
   apiToken: string;
   $q;
 
