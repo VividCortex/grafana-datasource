@@ -149,4 +149,60 @@ describe('VividCortex datasource', () => {
       expect(filteredHosts[0].id).to.equal(2);
     });
   });
+
+  describe('#transformMetricForQuery()', () => {
+    it('should return the same metric if no transform is required', () => {
+      expect(datasource.transformMetricForQuery('host.queries.q.c0f33.tput')).to.equal('host.queries.q.c0f33.tput');
+    });
+
+    it('should transform multiple metrics to the VC format', () => {
+      const input = '(host.queries.q.c0f33.tput|host.queries.q.c0f33.tput)';
+      const expectedOutput = 'host.queries.q.c0f33.tput,host.queries.q.c0f33.tput';
+
+      expect(datasource.transformMetricForQuery(input)).to.equal(expectedOutput);
+    });
+  });
+
+  describe('#mapQueryResponse()', () => {
+    it('should return an empty array if no data was provided', () => {
+      expect(datasource.mapQueryResponse([], 123456789, 987654321)).to.deep.equal({ data: [] });
+      expect(datasource.mapQueryResponse([{ elements: [] }], 123456789, 987654321)).to.deep.equal({ data: [] });
+    });
+
+    it('should return an empty array if no data was provided', () => {
+      const input = [
+        {
+          elements: [
+            {
+              metric: 'host.queries.q.c0f33b4c0n.tput',
+              series: [0, 1, 0],
+            },
+          ],
+        },
+        {
+          elements: [
+            {
+              metric: 'host.queries.q.b33fav0c4d0.tput',
+              series: [0, 0, 1],
+            },
+          ],
+        },
+      ];
+
+      const expectedOutput = {
+        data: [
+          {
+            target: 'host.queries.q.c0f33b4c0n.tput',
+            datapoints: [[0, 123456789000], [1, 411522633000], [0, 699588477000]],
+          },
+          {
+            target: 'host.queries.q.b33fav0c4d0.tput',
+            datapoints: [[0, 123456789000], [0, 411522633000], [1, 699588477000]],
+          },
+        ],
+      };
+
+      expect(datasource.mapQueryResponse(input, 123456789, 987654321)).to.deep.equal(expectedOutput);
+    });
+  });
 });

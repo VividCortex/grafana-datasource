@@ -56,10 +56,8 @@ const backendSrv = {
           data: {
             data: [
               {
-                total: 1,
                 elements: [
                   {
-                    rank: 1,
                     metric: 'host.queries.q.df1855d5cf5d39ca.tput',
                     series: [0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
                   },
