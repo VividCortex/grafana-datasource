@@ -7,13 +7,17 @@ import { backendSrv, templateSrv } from './lib/mocks';
 
 const config = require('../src/config.json');
 
-const datasource = new VividCortexDatasource({ jsonData: { apiToken: 'success' } }, backendSrv, templateSrv, $q);
-const errorDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'error' } }, backendSrv, templateSrv, $q);
-
 const datasourceRequestSpy = sinon.spy(backendSrv, 'datasourceRequest');
 const replaceSpy = sinon.spy(templateSrv, 'replace');
 
+let datasource, errorDatasource;
+
 describe('VividCortex datasource', () => {
+  beforeEach(() => {
+    datasource = new VividCortexDatasource({ jsonData: { apiToken: 'success' } }, backendSrv, templateSrv, $q);
+    errorDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'error' } }, backendSrv, templateSrv, $q);
+  });
+
   it('should be instantiable', () => {
     expect(datasource).not.to.be.undefined;
   });
