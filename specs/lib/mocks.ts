@@ -33,7 +33,7 @@ const backendSrv = {
       },
     },
   },
-  datasourceRequest: options => {
+  datasourceRequest: function(options) {
     const endpoint = options.url.replace(config.apiUrl, ''),
       apiToken = options.headers.Authorization.replace('Bearer ', ''),
       response = backendSrv.requests[options.method][endpoint][apiToken];

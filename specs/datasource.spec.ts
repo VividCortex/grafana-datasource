@@ -1,12 +1,17 @@
 import { expect } from 'chai';
 import 'mocha';
 import $q from 'q';
+import * as sinon from 'sinon';
 import VividCortexDatasource from '../src/datasource';
 import { backendSrv, templateSrv } from './lib/mocks';
+
+const config = require('../src/config.json');
 
 const datasource = new VividCortexDatasource({ jsonData: { apiToken: 'success' } }, backendSrv, templateSrv, $q);
 
 const errorDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'error' } }, backendSrv, templateSrv, $q);
+
+const datasourceRequestSpy = sinon.spy(backendSrv, 'datasourceRequest');
 
 describe('VividCortex datasource', () => {
   it('should be instantiable', () => {
@@ -20,6 +25,10 @@ describe('VividCortex datasource', () => {
         message: 'Your VividCortex datasource was successfully configured.',
         title: 'Success',
       });
+
+      expect(datasourceRequestSpy.lastCall.args[0].method).to.equal('GET');
+      expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics');
+      expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal({});
 
       done();
     });
@@ -45,6 +54,11 @@ describe('VividCortex datasource', () => {
         text: 'host.verbs',
         value: 'host.verbs',
       });
+
+      expect(datasourceRequestSpy.lastCall.args[0].method).to.equal('GET');
+      expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics/search');
+      expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal({});
+      expect(datasourceRequestSpy.lastCall.args[0].params).to.deep.equal({ q: 'host.' });
 
       done();
     });
