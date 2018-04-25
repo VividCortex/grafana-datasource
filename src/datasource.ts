@@ -156,8 +156,6 @@ export default class VividCortexDatasource {
    * @return {Array}
    */
   filterHosts(hosts: Array<any>, config: string) {
-    console.log(parseFilters);
-
     const filters = parseFilters(config);
 
     return hosts.filter(host => testHost(host, filters));
