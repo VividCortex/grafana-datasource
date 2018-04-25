@@ -93,7 +93,9 @@ export default class VividCortexDatasource {
       from: from,
       until: until,
     }).then(response => {
-      params.host = this.filterHosts(response.data.data, target.hosts).join(',');
+      params.host = this.filterHosts(response.data.data, target.hosts)
+        .map(host => host.id)
+        .join(',');
 
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
@@ -150,13 +152,15 @@ export default class VividCortexDatasource {
    * Take an array of hosts and apply the configured filters.
    *
    * @param  {Array}  hosts
-   * @param  {object} config
+   * @param  {string} config
    * @return {Array}
    */
-  filterHosts(hosts: Array<any>, config: any) {
+  filterHosts(hosts: Array<any>, config: string) {
+    console.log(parseFilters);
+
     const filters = parseFilters(config);
 
-    return hosts.filter(host => testHost(host, filters)).map(host => host.id);
+    return hosts.filter(host => testHost(host, filters));
   }
 
   /**
