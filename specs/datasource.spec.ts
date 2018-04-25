@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import 'mocha';
-import $q from 'q';
+import * as $q from 'q';
 import * as sinon from 'sinon';
 import VividCortexDatasource from '../src/datasource';
 import { backendSrv, templateSrv } from './lib/mocks';
@@ -59,6 +59,37 @@ describe('VividCortex datasource', () => {
       expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics/search');
       expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal({});
       expect(datasourceRequestSpy.lastCall.args[0].params).to.deep.equal({ q: 'host.' });
+
+      done();
+    });
+  });
+
+  it('should not attempt to hit the API with no targets', done => {
+    datasource.query({ targets: [] }).then(response => {
+      expect(response.data.length).to.equal(0);
+
+      done();
+    });
+  });
+
+  it('should perform as many API requests as configured targets', done => {
+    const doQuerySpy = sinon.spy(datasource, 'doQuery');
+
+    const options = {
+      targets: [
+        { target: 'host.queries.*.*.tput', hosts: 'type=mysql' },
+        { target: 'host.queries.*.*.t_us', hosts: 'type=mysql' },
+      ],
+      range: {
+        from: { unix: () => 123456789 },
+        to: { unix: () => 987654321 },
+      },
+    };
+
+    datasource.query(options).then(response => {
+      expect(doQuerySpy.callCount).to.equal(2);
+
+      expect(response.data.length).to.equal(2);
 
       done();
     });

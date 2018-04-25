@@ -1,5 +1,5 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
-import { parseFilters, testHost } from './lib/filters';
+import { parseFilters, testHost } from './lib/host_filter';
 
 export default class VividCortexDatasource {
   apiToken: string;
@@ -93,7 +93,7 @@ export default class VividCortexDatasource {
       from: from,
       until: until,
     }).then(response => {
-      params.host = this.filterHosts(response.data.data, target.hosts);
+      params.host = this.filterHosts(response.data.data, target.hosts).join(',');
 
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
@@ -156,10 +156,7 @@ export default class VividCortexDatasource {
   filterHosts(hosts: Array<any>, config: any) {
     const filters = parseFilters(config);
 
-    return hosts
-      .filter(host => testHost(host, filters))
-      .map(host => host.id)
-      .join(',');
+    return hosts.filter(host => testHost(host, filters)).map(host => host.id);
   }
 
   /**

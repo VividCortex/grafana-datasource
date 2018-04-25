@@ -1,6 +1,17 @@
 const $q = require('q');
 const config = require('../../src/config.json');
 
+function getHeaders(header) {
+  switch (header) {
+    case 'X-Vc-Meta-From':
+      return 123456789;
+    case 'X-Vc-Meta-Until':
+      return 987654321;
+  }
+
+  return 0;
+}
+
 const backendSrv = {
   requests: {
     GET: {
@@ -29,6 +40,34 @@ const backendSrv = {
               'host.verbs',
             ],
           },
+        },
+      },
+      hosts: {
+        success: {
+          data: {
+            data: [{ id: 1, name: 'testing-host-1', type: 'mysql' }],
+          },
+        },
+      },
+    },
+    POST: {
+      'metrics/query-series': {
+        success: {
+          data: {
+            data: [
+              {
+                total: 1,
+                elements: [
+                  {
+                    rank: 1,
+                    metric: 'host.queries.q.df1855d5cf5d39ca.tput',
+                    series: [0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
+                  },
+                ],
+              },
+            ],
+          },
+          headers: getHeaders,
         },
       },
     },
