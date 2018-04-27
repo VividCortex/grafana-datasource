@@ -1,16 +1,12 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
-import { parseFilters, testHost } from './lib/filters';
+import { parseFilters, testHost } from './lib/host_filter';
 
-export default class VividCortexMetricsDatasource {
+export default class VividCortexDatasource {
   apiToken: string;
-  $q;
 
   /** @ngInject */
-  constructor(instanceSettings, private backendSrv, private templateSrv, $q) {
+  constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
     this.apiToken = instanceSettings.jsonData.apiToken;
-    this.backendSrv = backendSrv;
-    this.templateSrv = templateSrv;
-    this.$q = $q;
   }
 
   testDatasource() {
@@ -97,7 +93,9 @@ export default class VividCortexMetricsDatasource {
       from: from,
       until: until,
     }).then(response => {
-      params.host = this.filterHosts(response.data.data, target.hosts);
+      params.host = this.filterHosts(response.data.data, target.hosts)
+        .map(host => host.id)
+        .join(',');
 
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
@@ -154,16 +152,13 @@ export default class VividCortexMetricsDatasource {
    * Take an array of hosts and apply the configured filters.
    *
    * @param  {Array}  hosts
-   * @param  {object} config
+   * @param  {string} config
    * @return {Array}
    */
-  filterHosts(hosts: Array<any>, config: any) {
+  filterHosts(hosts: Array<any>, config: string) {
     const filters = parseFilters(config);
 
-    return hosts
-      .filter(host => testHost(host, filters))
-      .map(host => host.id)
-      .join(',');
+    return hosts.filter(host => testHost(host, filters));
   }
 
   /**

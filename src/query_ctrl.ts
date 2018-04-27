@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { QueryCtrl } from 'app/plugins/sdk';
 import './css/query_editor.css!';
 
-export class VividCortexMetricsQueryCtrl extends QueryCtrl {
+export class VividCortexQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
 
   defaults = {};
