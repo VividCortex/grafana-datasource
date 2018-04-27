@@ -5,7 +5,7 @@ import { parseFilters, testHost } from '../src/lib/host_filter';
 
 const parseSpy = sinon.spy(parseFilters);
 
-describe.only('Filter parser', () => {
+describe('Filter parser', () => {
   it('should not fail with empty configuration', () => {
     const result = parseFilters('');
 

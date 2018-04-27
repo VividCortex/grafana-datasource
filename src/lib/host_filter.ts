@@ -49,13 +49,13 @@ function parseFilters(config: string) {
  */
 function testHost(host: any, filters: Array<any>) {
   return filters.reduce((included, filter) => {
-    if (!included) {
-      return false;
-    }
+    if (included) {
+      return true;
+    } // Once a filter matched, there is no need to keep evaluating
 
     if (!filter.value) {
       return true;
-    } //include all the hosts by default
+    } // Include all the hosts by default
 
     switch (filter.type) {
       case 'attribute':
@@ -67,7 +67,7 @@ function testHost(host: any, filters: Array<any>) {
       default:
         return host.name.indexOf(filter.value) >= 0;
     }
-  }, true);
+  }, false);
 }
 
 export { parseFilters, testHost };
