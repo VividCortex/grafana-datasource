@@ -56,7 +56,7 @@ describe('VividCortex datasource', () => {
   describe('#metricFindQuery()', () => {
     it('should search for metric names', done => {
       datasource.metricFindQuery('host.').then(response => {
-        expect(response.length).to.equal(11);
+        expect(response).to.have.lengthOf(11);
         expect(response[10]).to.deep.equal({
           text: 'host.verbs',
           value: 'host.verbs',
@@ -75,7 +75,7 @@ describe('VividCortex datasource', () => {
   describe('#query()', () => {
     it('should not attempt to hit the API with no targets', done => {
       datasource.query({ targets: [] }).then(response => {
-        expect(response.data.length).to.equal(0);
+        expect(response.data).to.have.lengthOf(0);
 
         done();
       });
@@ -98,7 +98,7 @@ describe('VividCortex datasource', () => {
       datasource.query(options).then(response => {
         expect(doQuerySpy.callCount).to.equal(2);
 
-        expect(response.data.length).to.equal(2);
+        expect(response.data).to.have.lengthOf(2);
 
         done();
       });
@@ -149,7 +149,7 @@ describe('VividCortex datasource', () => {
     });
 
     it('should filter a set of hosts based in a user provided configuration string', () => {
-      expect(filteredHosts.length).to.equal(1);
+      expect(filteredHosts).to.have.lengthOf(1);
       expect(filteredHosts[0].id).to.equal(2);
     });
   });

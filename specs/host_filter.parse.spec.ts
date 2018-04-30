@@ -121,7 +121,7 @@ describe('Filter parser', () => {
     it('should parse mixed filters', () => {
       const result = parseFilters('type=os "ip-192-168-133-7" red');
 
-      expect(result.length).to.equal(3);
+      expect(result).to.have.lengthOf(3);
 
       expect(result).to.deep.equal([
         {

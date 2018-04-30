@@ -15,7 +15,7 @@ describe('Host filter', () => {
       filters = parseFilters(config),
       result = hosts.filter(host => testHost(host, filters));
 
-    expect(result.length).to.equal(3);
+    expect(result).to.have.lengthOf(3);
   });
 
   describe('Key=value filters', () => {
@@ -24,7 +24,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(1);
+      expect(result).to.have.lengthOf(1);
       expect(result[0].id).to.equal(1);
     });
 
@@ -33,7 +33,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(1);
+      expect(result).to.have.lengthOf(1);
       expect(result[0].id).to.equal(3);
     });
 
@@ -42,7 +42,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(2);
+      expect(result).to.have.lengthOf(2);
       expect(result[0].id).to.equal(1);
       expect(result[1].id).to.equal(3);
     });
@@ -54,7 +54,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(1);
+      expect(result).to.have.lengthOf(1);
       expect(result[0].id).to.equal(1);
     });
 
@@ -63,7 +63,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(2);
+      expect(result).to.have.lengthOf(2);
       expect(result[0].id).to.equal(1);
       expect(result[1].id).to.equal(2);
     });
@@ -75,7 +75,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(3);
+      expect(result).to.have.lengthOf(3);
       expect(result[0].id).to.equal(1);
       expect(result[1].id).to.equal(2);
       expect(result[2].id).to.equal(3);
@@ -86,7 +86,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(3);
+      expect(result).to.have.lengthOf(3);
       expect(result[0].id).to.equal(1);
       expect(result[1].id).to.equal(2);
       expect(result[2].id).to.equal(3);
@@ -99,7 +99,7 @@ describe('Host filter', () => {
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
-      expect(result.length).to.equal(3);
+      expect(result).to.have.lengthOf(3);
       expect(result[0].id).to.equal(1);
       expect(result[1].id).to.equal(2);
       expect(result[2].id).to.equal(3);
