@@ -16,7 +16,7 @@ jobs:
           - deps-{{ checksum "package.json" }}-
           - deps-
 
-      - run: yarn install
+      - run: yarn install --pure-lockfile
 
       - save_cache:
           paths:
