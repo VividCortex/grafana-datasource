@@ -9,12 +9,6 @@ module.exports = function(grunt) {
     clean: ['dist'],
 
     copy: {
-      dist_js: {
-        expand: true,
-        cwd: 'src',
-        src: ['**/*.ts', '**/*.d.ts'],
-        dest: 'dist',
-      },
       dist_html: {
         expand: true,
         flatten: true,
@@ -46,12 +40,12 @@ module.exports = function(grunt) {
 
     typescript: {
       build: {
-        src: ['dist/**/*.ts', '!**/*.d.ts'],
+        src: ['src/**/*.ts', '!**/*.d.ts'],
         dest: 'dist',
         options: {
           module: 'system',
           target: 'es5',
-          rootDir: 'dist/',
+          rootDir: 'src/',
           declaration: true,
           emitDecoratorMetadata: true,
           experimentalDecorators: true,
@@ -72,7 +66,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'clean',
-    'copy:dist_js',
     'typescript:build',
     'copy:dist_html',
     'copy:dist_css',
