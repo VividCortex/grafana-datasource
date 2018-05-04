@@ -1,13 +1,19 @@
 {
   "name": "vividcortex-metrics-datasource",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Grafana datasource plugin for VividCortex metrics.",
   "scripts": {
     "build": "grunt",
     "watch": "grunt watch",
     "test": "mocha -r ts-node/register specs/**/*.spec.ts",
     "precommit": "pretty-quick --staged",
-    "lint": "yarn eslint src/**/*.ts"
+    "lint": "yarn eslint src/**/*.ts",
+    "bump": "npm-bump patch",
+    "bump:minor": "npm-bump minor",
+    "bump:major": "npm-bump major",
+    "release": "npm-run-all build bump",
+    "release:minor": "npm-run-all build bump:minor",
+    "release:major": "npm-run-all build bump:major"
   },
   "author": "VividCortex",
   "license": "MIT",
