@@ -8,10 +8,10 @@
     "test": "mocha -r ts-node/register specs/**/*.spec.ts",
     "precommit": "pretty-quick --staged",
     "lint": "yarn eslint src/**/*.ts",
-    "bump": "npm-bump patch",
+    "bump:patch": "npm-bump patch",
     "bump:minor": "npm-bump minor",
     "bump:major": "npm-bump major",
-    "release": "npm-run-all build bump",
+    "release:patch": "npm-run-all build bump:patch",
     "release:minor": "npm-run-all build bump:minor",
     "release:major": "npm-run-all build bump:major"
   },
