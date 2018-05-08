@@ -4,8 +4,6 @@ jobs:
   build:
     docker:
       - image: circleci/node:8.11.1
-        environment:
-          CODECOV_TOKEN: "175362cc-601c-4561-81b6-e8765ccc275b"
 
     working_directory: ~/datasource
 
