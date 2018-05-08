@@ -53,6 +53,12 @@ describe('VividCortex datasource', () => {
     });
   });
 
+  describe('#annotationQuery()', () => {
+    it('Should not be implemented', () => {
+      expect(datasource.annotationQuery).to.throw();
+    });
+  });
+
   describe('#metricFindQuery()', () => {
     it('should search for metric names', done => {
       datasource.metricFindQuery('host.').then(response => {
