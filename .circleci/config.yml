@@ -4,6 +4,8 @@ jobs:
   build:
     docker:
       - image: circleci/node:8.11.1
+        environment:
+          CODECOV_TOKEN: "175362cc-601c-4561-81b6-e8765ccc275b"
 
     working_directory: ~/datasource
 
@@ -16,12 +18,23 @@ jobs:
           - deps-{{ checksum "package.json" }}-
           - deps-
 
-      - run: yarn install --pure-lockfile
+      - run:
+          name: Install dependencies
+          command: yarn install --pure-lockfile
 
       - save_cache:
           paths:
             - node_modules
-
           key: deps-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
 
-      - run: yarn test
+      - run:
+          name: Run unit tests
+          command:  yarn test:coverage
+
+      - run:
+          name: Report coverage
+          command:  yarn coverage:report
+
+      - run:
+          name: Upload coverage
+          command:  yarn codecov
