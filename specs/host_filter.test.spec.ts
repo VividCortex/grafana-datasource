@@ -50,7 +50,7 @@ describe('Host filter', () => {
 
   describe('Exact filters', () => {
     it('should match exact names', () => {
-      const config = 'testing-host-1',
+      const config = '"testing-host-1"',
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
@@ -66,6 +66,37 @@ describe('Host filter', () => {
       expect(result).to.have.lengthOf(2);
       expect(result[0].id).to.equal(1);
       expect(result[1].id).to.equal(2);
+    });
+  });
+
+  describe('Exclude filters', () => {
+    it('should exclude hosts by name', () => {
+      const config = '-"testing-host-1"',
+        filters = parseFilters(config),
+        result = hosts.filter(host => testHost(host, filters));
+
+      expect(result).to.have.lengthOf(2);
+      expect(result[0].id).to.equal(2);
+      expect(result[1].id).to.equal(3);
+    });
+
+    it('should exclude multiple names', () => {
+      const config = '-"testing-host-1" -"testing-host-2"',
+        filters = parseFilters(config),
+        result = hosts.filter(host => testHost(host, filters));
+
+      expect(result).to.have.lengthOf(1);
+      expect(result[0].id).to.equal(3);
+    });
+
+    it('should not affect other filters', () => {
+      const config = '-"testing-host-1" type=mongo testing-redis',
+        filters = parseFilters(config),
+        result = hosts.filter(host => testHost(host, filters));
+
+      expect(result).to.have.lengthOf(2);
+      expect(result[0].id).to.equal(2);
+      expect(result[1].id).to.equal(3);
     });
   });
 
@@ -95,7 +126,7 @@ describe('Host filter', () => {
 
   describe('Mixed filters', () => {
     it('should match mixed filters', () => {
-      const config = 'type=mysql "testing-host-2" redis',
+      const config = 'type=mysql "testing-host-2" redis -"this-other-host"',
         filters = parseFilters(config),
         result = hosts.filter(host => testHost(host, filters));
 
