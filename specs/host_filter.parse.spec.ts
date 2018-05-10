@@ -9,6 +9,8 @@ describe('Filter parser', () => {
   it('should not fail with empty configuration', () => {
     const result = parseFilters('');
 
+    expect(result).to.be.an('array');
+
     expect(parseSpy.threw()).to.be.false;
     expect(result).to.deep.equal([
       {
@@ -73,7 +75,7 @@ describe('Filter parser', () => {
       ]);
     });
 
-    it('should parse many key=value filters', () => {
+    it('should parse many exact filters', () => {
       const result = parseFilters('"ip-192-168-133-7" "redis2"');
 
       expect(result).to.deep.equal([
@@ -83,6 +85,34 @@ describe('Filter parser', () => {
         },
         {
           type: 'exact',
+          value: 'redis2',
+        },
+      ]);
+    });
+  });
+
+  describe('Exclude filters', () => {
+    it('should parse an exact filter', () => {
+      const result = parseFilters('-"ip-192-168-133-7"');
+
+      expect(result).to.deep.equal([
+        {
+          type: 'exclude',
+          value: 'ip-192-168-133-7',
+        },
+      ]);
+    });
+
+    it('should parse many exclude filters', () => {
+      const result = parseFilters('-"ip-192-168-133-7" -"redis2"');
+
+      expect(result).to.deep.equal([
+        {
+          type: 'exclude',
+          value: 'ip-192-168-133-7',
+        },
+        {
+          type: 'exclude',
           value: 'redis2',
         },
       ]);

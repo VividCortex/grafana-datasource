@@ -48,6 +48,18 @@ function parseFilters(config: string) {
  * @return {boolean}
  */
 function testHost(host: any, filters: Array<any>) {
+  const isExcluded = filters.reduce((excluded, filter) => {
+    if (filter.type === 'exclude' && host.name === filter.value) {
+      return true;
+    }
+
+    return excluded;
+  }, false);
+
+  if (isExcluded) {
+    return false;
+  }
+
   return filters.reduce((included, filter) => {
     if (included) {
       return true;
@@ -62,10 +74,12 @@ function testHost(host: any, filters: Array<any>) {
         return host[filter.key] === filter.value;
       case 'exact':
         return host.name === filter.value;
-      case 'exclude':
-        return host.name !== filter.value;
-      default:
+      case 'substring':
         return host.name.indexOf(filter.value) >= 0;
+      case 'exclude':
+        return true;
+      default:
+        return included;
     }
   }, false);
 }
