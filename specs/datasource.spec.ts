@@ -119,6 +119,12 @@ describe('VividCortex datasource', () => {
 
       expect(replaceSpy.lastCall.args[0]).to.equal(metric);
     });
+
+    it('should not fail when given an undefined metric', () => {
+      const metric = undefined;
+
+      expect(datasource.interpolateVariables(metric)).to.equal('');
+    });
   });
 
   describe('#doRequest()', () => {
@@ -170,6 +176,10 @@ describe('VividCortex datasource', () => {
       const expectedOutput = 'host.queries.q.c0f33.tput,host.queries.q.c0f33.tput';
 
       expect(datasource.transformMetricForQuery(input)).to.equal(expectedOutput);
+    });
+
+    it('should not fail when given an undefined metric', () => {
+      expect(datasource.transformMetricForQuery(undefined)).to.equal('');
     });
   });
 

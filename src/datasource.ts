@@ -120,7 +120,7 @@ export default class VividCortexDatasource {
    * @param  {string} metric
    * @return {string}
    */
-  interpolateVariables(metric: string) {
+  interpolateVariables(metric: string = '') {
     return this.templateSrv.replace(metric, null, 'regex').replace(/\\\./g, '.');
   }
 
@@ -168,7 +168,7 @@ export default class VividCortexDatasource {
    * @param  {string} metric
    * @return {string}
    */
-  transformMetricForQuery(metric: string) {
+  transformMetricForQuery(metric: string = '') {
     const metrics = metric.replace(/[()]/g, '').split('|');
 
     if (metrics.length < 2) {

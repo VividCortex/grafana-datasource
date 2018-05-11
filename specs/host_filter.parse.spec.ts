@@ -20,6 +20,20 @@ describe('Filter parser', () => {
     ]);
   });
 
+  it('should not fail with undefined configuration', () => {
+    const result = parseFilters(undefined);
+
+    expect(result).to.be.an('array');
+
+    expect(parseSpy.threw()).to.be.false;
+    expect(result).to.deep.equal([
+      {
+        type: 'substring',
+        value: '',
+      },
+    ]);
+  });
+
   describe('Key=value filters', () => {
     it('should parse a key=value filter', () => {
       const result = parseFilters('type=os');

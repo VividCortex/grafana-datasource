@@ -5,7 +5,7 @@
  * @return {Array}
  */
 
-function parseFilters(config: string) {
+function parseFilters(config: string = '') {
   const rawFilters = config.split(' ');
 
   return rawFilters.map(filter => {
