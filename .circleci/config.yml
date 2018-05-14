@@ -26,6 +26,14 @@ jobs:
           key: deps-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
 
       - run:
+          name: Run code linter
+          command: yarn lint
+
+      - run:
+          name: Build
+          command: yarn build
+
+      - run:
           name: Run unit tests
           command:  yarn test:coverage
 
