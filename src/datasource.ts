@@ -2,10 +2,10 @@
 import { parseFilters, testHost } from './lib/host_filter';
 
 export default class VividCortexDatasource {
-  apiToken: string;
-  backendSrv;
-  templateSrv;
-  $q;
+  private apiToken: string;
+  private backendSrv;
+  private templateSrv;
+  private $q;
 
   /** @ngInject */
   constructor(instanceSettings, backendSrv, templateSrv, $q) {
