@@ -9,7 +9,7 @@
     "test:coverage": "nyc mocha -r ts-node/register specs/**/*.spec.ts",
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "precommit": "pretty-quick --staged",
-    "lint": "yarn eslint src/**/*.ts",
+    "lint": "yarn eslint src/*.ts src/**/*.ts",
     "bump:patch": "npm-bump patch",
     "bump:minor": "npm-bump minor",
     "bump:major": "npm-bump major",
@@ -20,7 +20,6 @@
   "author": "VividCortex",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.5",
     "moment": "^2.22.0",
     "q": "^1.5.1",
     "systemjs": "^0.21.1"

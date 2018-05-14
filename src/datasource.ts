@@ -3,9 +3,16 @@ import { parseFilters, testHost } from './lib/host_filter';
 
 export default class VividCortexDatasource {
   apiToken: string;
+  backendSrv;
+  templateSrv;
+  $q;
 
   /** @ngInject */
-  constructor(instanceSettings, private backendSrv, private templateSrv, private $q) {
+  constructor(instanceSettings, backendSrv, templateSrv, $q) {
+    this.backendSrv = backendSrv;
+    this.templateSrv = templateSrv;
+    this.$q = $q;
+
     this.apiToken = instanceSettings.jsonData.apiToken;
   }
 
@@ -35,7 +42,7 @@ export default class VividCortexDatasource {
     );
   }
 
-  annotationQuery(options) {
+  annotationQuery() {
     throw new Error('Annotation support not implemented yet.');
   }
 
