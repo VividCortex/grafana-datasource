@@ -5,12 +5,33 @@
 
 ## How to use
 
-Clone or download the repository files and place them in your Grafana plugins folder, typically found in `data/plugins`.
+Clone or download the repository files and place them in your Grafana plugins folder, typically found in `<path/to/graphana>/data/plugins` or, on Linux systems, the plugin directory is `/var/lib/grafana/plugins`.
 Restart Grafana, log in, and go to **Configuration** > **Data Sources** > **Add data source** and configure your VividCortex API Token.
 
-## Generating an API Token
+### Generating an API Token
 
 In your VivivCortex dashboard, go to Settings, Api Tokens and generate a new one.
+
+### Configuring your graph
+
+In the panel configuration, after selecting your VividCortex Datasource, you will see a row with a dropdown (to select the metric) and a text input (to filter your hosts).
+
+The metrics dropdown has an autocomplete feature, which will fetch more values (if available) after entering a period. For example `host.` will autocomplete to `host.queries`, `host.indexes`, etc.
+
+The hosts filter shares some features with the VividCortex app:
+
+* By default, if you type _api_, any host whose name includes the substring _api_ will become part of the set of active hosts.
+* You can match hostnames exactly by wrapping them with the double quotes sign. The string _"api2"_, for example, will match a host named _api2_ but not one named _api20_.
+* You can exclude hosts from the selection by negating them with a minus sign. For example, _-"api20"_.
+* You can select hosts by their type (os, mysql, pgsql, redis and mongo at present), with syntax such as _type=os_ or _type=mysql_.
+
+Select a metric, filter your desired hosts and click on the `eye` icon to preview.
+
+[Learn more about metric categories](https://docs.vividcortex.com/general-reference/metric-categories/)
+
+Sample configuration:
+
+![sample configuration](https://user-images.githubusercontent.com/1069378/39949018-ec4c424c-554e-11e8-8927-181d94c4a100.png)
 
 ## Development guide
 
