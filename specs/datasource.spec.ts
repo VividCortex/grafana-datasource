@@ -96,12 +96,15 @@ describe('VividCortex datasource', () => {
           { target: 'host.queries.*.*.t_us', hosts: 'type=mysql' },
         ],
         range: {
-          from: { unix: () => 123456789 },
-          to: { unix: () => 987654321 },
+          from: { unix: () => 123456789, utc: sinon.spy() },
+          to: { unix: () => 987654321, utc: sinon.spy() },
         },
       };
 
       datasource.query(options).then(response => {
+        expect(options.range.from.utc.called).to.be.true;
+        expect(options.range.to.utc.called).to.be.true;
+
         expect(doQuerySpy.callCount).to.equal(2);
 
         expect(response.data).to.have.lengthOf(2);
