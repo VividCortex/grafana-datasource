@@ -1,5 +1,6 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
 import { parseFilters, testHost } from './lib/host_filter';
+import { calculateSampleSize } from './lib/helpers';
 
 export default class VividCortexDatasource {
   private apiToken: string;
@@ -65,7 +66,7 @@ export default class VividCortexDatasource {
       options.range.from.utc();
       options.range.to.utc();
 
-      return this.doQuery(target, options.range.from.unix(), options.range.to.unix());
+      return this.doQuery(target, options.range.from.unix(), options.range.to.unix(), options.maxDataPoints);
     });
 
     return this.$q.all(promises).then(function(responses) {
@@ -83,12 +84,13 @@ export default class VividCortexDatasource {
    * @param  {object} target
    * @param  {number} from
    * @param  {number} until
+   * @param  {number} dataPoints
    * @return {Promise}
    */
-  doQuery(target: any, from: number, until: number) {
+  doQuery(target: any, from: number, until: number, dataPoints: number) {
     const params = {
       from: from,
-      samplesize: 12,
+      samplesize: calculateSampleSize(from, until, dataPoints),
       until: until,
       host: null,
     };
