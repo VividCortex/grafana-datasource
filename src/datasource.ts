@@ -62,6 +62,9 @@ export default class VividCortexDatasource {
     }
 
     const promises = options.targets.map(target => {
+      options.range.from.utc();
+      options.range.to.utc();
+
       return this.doQuery(target, options.range.from.unix(), options.range.to.unix());
     });
 
