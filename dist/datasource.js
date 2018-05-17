@@ -1,10 +1,13 @@
-System.register(['./lib/host_filter'], function(exports_1) {
-  var host_filter_1;
+System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
+  var host_filter_1, helpers_1;
   var VividCortexDatasource;
   return {
     setters: [
       function(host_filter_1_1) {
         host_filter_1 = host_filter_1_1;
+      },
+      function(helpers_1_1) {
+        helpers_1 = helpers_1_1;
       },
     ],
     execute: function() {
@@ -63,7 +66,9 @@ System.register(['./lib/host_filter'], function(exports_1) {
             return this.$q.when({ data: [] });
           }
           var promises = options.targets.map(function(target) {
-            return _this.doQuery(target, options.range.from.unix(), options.range.to.unix());
+            options.range.from.utc();
+            options.range.to.utc();
+            return _this.doQuery(target, options.range.from.unix(), options.range.to.unix(), options.maxDataPoints);
           });
           return this.$q.all(promises).then(function(responses) {
             var result = responses.reduce(function(result, response) {
@@ -79,13 +84,14 @@ System.register(['./lib/host_filter'], function(exports_1) {
          * @param  {object} target
          * @param  {number} from
          * @param  {number} until
+         * @param  {number} dataPoints
          * @return {Promise}
          */
-        VividCortexDatasource.prototype.doQuery = function(target, from, until) {
+        VividCortexDatasource.prototype.doQuery = function(target, from, until, dataPoints) {
           var _this = this;
           var params = {
             from: from,
-            samplesize: 12,
+            samplesize: helpers_1.calculateSampleSize(from, until, dataPoints),
             until: until,
             host: null,
           };

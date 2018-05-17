@@ -16,9 +16,10 @@ export default class VividCortexDatasource {
    * @param  {object} target
    * @param  {number} from
    * @param  {number} until
+   * @param  {number} dataPoints
    * @return {Promise}
    */
-  doQuery(target: any, from: number, until: number): any;
+  doQuery(target: any, from: number, until: number, dataPoints: number): any;
   /**
    * Interpolate Grafana variables and strip scape characters.
    *
