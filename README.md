@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/VividCortex/grafana-datasource/tree/master.svg?style=svg&circle-token=2d19ab43f02c9fffd9ac06fd3fe241b0bad2f214)](https://circleci.com/gh/VividCortex/grafana-datasource/tree/master)
 [![codecov](https://codecov.io/gh/VividCortex/grafana-datasource/branch/develop/graph/badge.svg?token=GbWKRAvo3O)](https://codecov.io/gh/VividCortex/grafana-datasource)
 
-# VividCortex Metrics Datasource Plugin
+# VividCortex Datasource Plugin
 
 ## How to use
 
