@@ -1,4 +1,5 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
+import moment from 'moment';
 import { parseFilters, testHost } from './lib/host_filter';
 import { calculateSampleSize } from './lib/helpers';
 
@@ -7,6 +8,7 @@ export default class VividCortexDatasource {
   private backendSrv;
   private templateSrv;
   private $q;
+  private metricFindDefer;
 
   /** @ngInject */
   constructor(instanceSettings, backendSrv, templateSrv, $q) {
@@ -47,14 +49,34 @@ export default class VividCortexDatasource {
     throw new Error('Annotation support not implemented yet.');
   }
 
-  metricFindQuery(query: string) {
+  metricFindQuery() {
     const params = {
-      q: this.interpolateVariables(query),
+      from: moment()
+        .utc()
+        .subtract(7, 'days')
+        .unix(),
+      until: moment()
+        .utc()
+        .unix(),
+      host: '0',
     };
 
-    return this.doRequest('metrics/search', 'GET', params)
-      .then(response => response.data.data || [])
-      .then(metrics => metrics.map(metric => ({ text: metric, value: metric })));
+    const defer = this.$q.defer();
+
+    this.getActiveHosts(params.from, params.until)
+      .then(hosts => {
+        params.host += hosts.map(host => host.id).join(',');
+
+        this.doRequest('metrics', 'GET', params)
+          .then(response => response.data.data || [])
+          .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
+          .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)))
+          .then(metrics => defer.resolve(metrics))
+          .catch(error => defer.reject(error));
+      })
+      .catch(error => defer.reject(error));
+
+    return defer.promise;
   }
 
   query(options) {
@@ -79,6 +101,22 @@ export default class VividCortexDatasource {
   /* Custom methods ----------------------------------------------------------------------------- */
 
   /**
+   * Get the active hosts in a time interval.
+   *
+   * @param  {number} from:
+   * @param  {number} until
+   * @return {Promise}
+   */
+  getActiveHosts(from: number, until: number) {
+    return this.doRequest('hosts', 'GET', {
+      from: from,
+      until: until,
+    }).then(response => {
+      return response.data.data;
+    });
+  }
+
+  /**
    * Perform a query-series query for a given target (host and metric) in a time frame.
    *
    * @param  {object} target
@@ -99,13 +137,16 @@ export default class VividCortexDatasource {
       metrics: this.transformMetricForQuery(this.interpolateVariables(target.target)),
     };
 
+    if (this.metricFindDefer) {
+      this.metricFindDefer.resolve([]);
+    }
+
     const defer = this.$q.defer();
 
-    this.doRequest('hosts', 'GET', {
-      from: from,
-      until: until,
-    }).then(response => {
-      params.host = this.filterHosts(response.data.data, target.hosts)
+    this.metricFindDefer = defer;
+
+    this.getActiveHosts(params.from, params.until).then(hosts => {
+      params.host = this.filterHosts(hosts, target.hosts)
         .map(host => host.id)
         .join(',');
 
