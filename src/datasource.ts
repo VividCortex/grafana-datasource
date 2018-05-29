@@ -91,9 +91,11 @@ export default class VividCortexDatasource {
   }
 
   /* Custom methods ----------------------------------------------------------------------------- */
-  refreshHostsForMetrics() {
-    console.log('Refreshing active hosts for metrics query');
 
+  /**
+   * Load the host list to use for the metric find query.
+   */
+  refreshHostsForMetrics() {
     const params = {
       from: moment()
         .utc()
