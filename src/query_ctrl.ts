@@ -16,8 +16,6 @@ export class VividCortexQueryCtrl extends QueryCtrl {
     this.target.target = this.target.target || 'select metric';
     this.target.type = this.target.type || 'timeserie';
 
-    this.datasource.refreshHostsForMetrics();
-
     this.debouncedMetricFind = _.debounce(this.datasource.metricFindQuery.bind(this.datasource), 250);
   }
 

@@ -8,7 +8,6 @@ export default class VividCortexDatasource {
   private backendSrv;
   private templateSrv;
   private $q;
-  private metricsHosts = [];
 
   /** @ngInject */
   constructor(instanceSettings, backendSrv, templateSrv, $q) {
@@ -17,8 +16,6 @@ export default class VividCortexDatasource {
     this.$q = $q;
 
     this.apiToken = instanceSettings.jsonData.apiToken;
-
-    this.refreshHostsForMetrics();
   }
 
   testDatasource() {
@@ -60,7 +57,6 @@ export default class VividCortexDatasource {
       until: moment()
         .utc()
         .unix(),
-      host: '0,' + this.metricsHosts.map(host => host.id).join(','),
       new: '0',
       filter: query ? `*${query}*` : undefined,
     };
@@ -91,23 +87,6 @@ export default class VividCortexDatasource {
   }
 
   /* Custom methods ----------------------------------------------------------------------------- */
-
-  /**
-   * Load the host list to use for the metric find query.
-   */
-  refreshHostsForMetrics() {
-    const params = {
-      from: moment()
-        .utc()
-        .subtract(7, 'days')
-        .unix(),
-      until: moment()
-        .utc()
-        .unix(),
-    };
-
-    this.getActiveHosts(params.from, params.until).then(hosts => (this.metricsHosts = hosts));
-  }
 
   /**
    * Get the active hosts in a time interval.
