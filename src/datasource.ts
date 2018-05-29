@@ -8,7 +8,7 @@ export default class VividCortexDatasource {
   private backendSrv;
   private templateSrv;
   private $q;
-  private metricFindDefer;
+  private metricsHosts = [];
 
   /** @ngInject */
   constructor(instanceSettings, backendSrv, templateSrv, $q) {
@@ -17,6 +17,8 @@ export default class VividCortexDatasource {
     this.$q = $q;
 
     this.apiToken = instanceSettings.jsonData.apiToken;
+
+    this.refreshHostsForMetrics();
   }
 
   testDatasource() {
@@ -49,7 +51,7 @@ export default class VividCortexDatasource {
     throw new Error('Annotation support not implemented yet.');
   }
 
-  metricFindQuery() {
+  metricFindQuery(query: string) {
     const params = {
       from: moment()
         .utc()
@@ -58,25 +60,15 @@ export default class VividCortexDatasource {
       until: moment()
         .utc()
         .unix(),
-      host: '0',
+      host: '0,' + this.metricsHosts.map(host => host.id).join(','),
+      new: '0',
+      filter: query ? `*${query}*` : undefined,
     };
 
-    const defer = this.$q.defer();
-
-    this.getActiveHosts(params.from, params.until)
-      .then(hosts => {
-        params.host += hosts.map(host => host.id).join(',');
-
-        this.doRequest('metrics', 'GET', params)
-          .then(response => response.data.data || [])
-          .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
-          .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)))
-          .then(metrics => defer.resolve(metrics))
-          .catch(error => defer.reject(error));
-      })
-      .catch(error => defer.reject(error));
-
-    return defer.promise;
+    return this.doRequest('metrics', 'GET', params)
+      .then(response => response.data.data || [])
+      .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
+      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)));
   }
 
   query(options) {
@@ -99,6 +91,21 @@ export default class VividCortexDatasource {
   }
 
   /* Custom methods ----------------------------------------------------------------------------- */
+  refreshHostsForMetrics() {
+    console.log('Refreshing active hosts for metrics query');
+
+    const params = {
+      from: moment()
+        .utc()
+        .subtract(7, 'days')
+        .unix(),
+      until: moment()
+        .utc()
+        .unix(),
+    };
+
+    this.getActiveHosts(params.from, params.until).then(hosts => (this.metricsHosts = hosts));
+  }
 
   /**
    * Get the active hosts in a time interval.
@@ -137,13 +144,7 @@ export default class VividCortexDatasource {
       metrics: this.transformMetricForQuery(this.interpolateVariables(target.target)),
     };
 
-    if (this.metricFindDefer) {
-      this.metricFindDefer.resolve([]);
-    }
-
     const defer = this.$q.defer();
-
-    this.metricFindDefer = defer;
 
     this.getActiveHosts(params.from, params.until).then(hosts => {
       params.host = this.filterHosts(hosts, target.hosts)
