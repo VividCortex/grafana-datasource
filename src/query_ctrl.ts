@@ -14,7 +14,7 @@ export class VividCortexQueryCtrl extends QueryCtrl {
     super($scope, $injector);
 
     this.target.target = this.target.target || 'select metric';
-    this.target.type = this.target.type || 'timeserie';
+    this.target.type = this.target.type || 'timeseries';
 
     this.debouncedMetricFind = _.debounce(this.datasource.metricFindQuery.bind(this.datasource), 250);
   }
