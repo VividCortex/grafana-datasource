@@ -1,6 +1,9 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
+import * as moment from 'moment';
 import { parseFilters, testHost } from './lib/host_filter';
 import { calculateSampleSize } from './lib/helpers';
+
+const momentjs = moment.default ? moment.default : moment;
 
 export default class VividCortexDatasource {
   private apiToken: string;
@@ -49,12 +52,21 @@ export default class VividCortexDatasource {
 
   metricFindQuery(query: string) {
     const params = {
-      q: this.interpolateVariables(query),
+      from: momentjs()
+        .utc()
+        .subtract(7, 'days')
+        .unix(),
+      until: momentjs()
+        .utc()
+        .unix(),
+      new: '0',
+      filter: query ? `*${query}*` : undefined,
     };
 
-    return this.doRequest('metrics/search', 'GET', params)
+    return this.doRequest('metrics', 'GET', params)
       .then(response => response.data.data || [])
-      .then(metrics => metrics.map(metric => ({ text: metric, value: metric })));
+      .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
+      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)));
   }
 
   query(options) {
@@ -79,6 +91,22 @@ export default class VividCortexDatasource {
   /* Custom methods ----------------------------------------------------------------------------- */
 
   /**
+   * Get the active hosts in a time interval.
+   *
+   * @param  {number} from:
+   * @param  {number} until
+   * @return {Promise}
+   */
+  getActiveHosts(from: number, until: number) {
+    return this.doRequest('hosts', 'GET', {
+      from: from,
+      until: until,
+    }).then(response => {
+      return response.data.data;
+    });
+  }
+
+  /**
    * Perform a query-series query for a given target (host and metric) in a time frame.
    *
    * @param  {object} target
@@ -101,11 +129,8 @@ export default class VividCortexDatasource {
 
     const defer = this.$q.defer();
 
-    this.doRequest('hosts', 'GET', {
-      from: from,
-      until: until,
-    }).then(response => {
-      params.host = this.filterHosts(response.data.data, target.hosts)
+    this.getActiveHosts(params.from, params.until).then(hosts => {
+      params.host = this.filterHosts(hosts, target.hosts)
         .map(host => host.id)
         .join(',');
 
