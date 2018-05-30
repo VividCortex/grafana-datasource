@@ -1,7 +1,9 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
-import moment from 'moment';
+import * as moment from 'moment';
 import { parseFilters, testHost } from './lib/host_filter';
 import { calculateSampleSize } from './lib/helpers';
+
+const momentjs = moment.default ? moment.default : moment;
 
 export default class VividCortexDatasource {
   private apiToken: string;
@@ -50,11 +52,11 @@ export default class VividCortexDatasource {
 
   metricFindQuery(query: string) {
     const params = {
-      from: moment()
+      from: momentjs()
         .utc()
         .subtract(7, 'days')
         .unix(),
-      until: moment()
+      until: momentjs()
         .utc()
         .unix(),
       new: '0',

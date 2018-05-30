@@ -69,9 +69,19 @@ describe('VividCortex datasource', () => {
         });
 
         expect(datasourceRequestSpy.lastCall.args[0].method).to.equal('GET');
-        expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics/search');
+        expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics');
         expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal({});
-        expect(datasourceRequestSpy.lastCall.args[0].params).to.deep.equal({ q: 'host.' });
+        expect(datasourceRequestSpy.lastCall.args[0].params['new']).to.equal('0');
+        expect(datasourceRequestSpy.lastCall.args[0].params['filter']).to.equal('*host.*');
+
+        done();
+      });
+    });
+
+    it('should not filter and get all the metrics by default', done => {
+      datasource.metricFindQuery('').then(response => {
+        expect(response).to.have.lengthOf(11);
+        expect(datasourceRequestSpy.lastCall.args[0].params['filter']).to.equal(undefined);
 
         done();
       });
@@ -108,6 +118,16 @@ describe('VividCortex datasource', () => {
         expect(doQuerySpy.callCount).to.equal(2);
 
         expect(response.data).to.have.lengthOf(2);
+
+        done();
+      });
+    });
+  });
+
+  describe('#getActiveHosts', () => {
+    it('should retrieve the active hosts in a time interval', done => {
+      datasource.getActiveHosts(123456789, 987654321).then(response => {
+        expect(response).to.have.lengthOf(1);
 
         done();
       });
