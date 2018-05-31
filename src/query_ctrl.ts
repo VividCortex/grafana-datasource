@@ -11,10 +11,12 @@ export class VividCortexQueryCtrl extends QueryCtrl {
   private metricFindDefer;
   private metricFindTimeout;
   private $q;
+  private $timeout;
 
   /** @ngInject **/
-  constructor($scope, $injector, $q) {
+  constructor($scope, $injector, $q, $timeout) {
     this.$q = $q;
+    this.$timeout = $timeout;
 
     super($scope, $injector);
 
@@ -29,9 +31,9 @@ export class VividCortexQueryCtrl extends QueryCtrl {
 
     this.loading = true;
 
-    clearTimeout(this.metricFindTimeout);
+    this.$timeout.cancel(this.metricFindTimeout);
 
-    this.metricFindTimeout = setTimeout(() => {
+    this.metricFindTimeout = this.$timeout(() => {
       this.datasource
         .metricFindQuery(query)
         .then(metrics => {
