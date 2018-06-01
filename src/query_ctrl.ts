@@ -1,26 +1,50 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import { QueryCtrl } from 'app/plugins/sdk';
-import _ from 'lodash';
 import './css/query_editor.css!';
 
 export class VividCortexQueryCtrl extends QueryCtrl {
   static templateUrl = 'partials/query.editor.html';
 
-  private debouncedMetricFind;
+  public loading;
+
+  private metricFindDefer;
+  private metricFindTimeout;
+  private $q;
+  private $timeout;
 
   /** @ngInject **/
-  constructor($scope, $injector) {
+  constructor($scope, $injector, $q, $timeout) {
+    this.$q = $q;
+    this.$timeout = $timeout;
+
     super($scope, $injector);
 
     this.target.target = this.target.target || 'select metric';
     this.target.type = this.target.type || 'timeseries';
-
-    this.debouncedMetricFind = _.debounce(this.datasource.metricFindQuery.bind(this.datasource), 250);
   }
 
   getOptions(query) {
-    return this.debouncedMetricFind(query);
+    if (!this.metricFindDefer) {
+      this.metricFindDefer = this.$q.defer();
+    }
+
+    this.loading = true;
+
+    this.$timeout.cancel(this.metricFindTimeout);
+
+    this.metricFindTimeout = this.$timeout(() => {
+      this.datasource
+        .metricFindQuery(query)
+        .then(metrics => {
+          this.loading = false;
+          this.metricFindDefer.resolve(metrics);
+        })
+        .catch(error => this.metricFindDefer.reject(error))
+        .finally(() => (this.metricFindDefer = null));
+    }, 250);
+
+    return this.metricFindDefer.promise;
   }
 
   onChangeInternal() {

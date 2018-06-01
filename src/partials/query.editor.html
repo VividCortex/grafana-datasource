@@ -8,6 +8,12 @@
   <div class="gf-form-group">
     <div class="gf-form-inline">
       <div class="gf-form">
+        <div class="vc-query-editor__loader-container">
+          <div class="vc-query-editor__loader" ng-show="ctrl.loading">
+            Loading...
+          </div>
+        </div>
+
         <gf-form-dropdown model="ctrl.target.target"
           allow-custom="true"
           lookup-text="true"
