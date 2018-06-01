@@ -121,7 +121,7 @@ export default class VividCortexDatasource {
       samplesize: calculateSampleSize(from, until, dataPoints),
       until: until,
       host: null,
-      separateHosts: target.separateHosts ? '1' : '0',
+      separateHosts: target.separateHosts ? 1 : 0,
     };
 
     const body = {

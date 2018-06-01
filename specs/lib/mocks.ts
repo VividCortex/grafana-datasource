@@ -34,9 +34,10 @@ const backendSrv = {
             ],
           },
         },
-        error: {
-          status: 500,
+        failure: {
+          status: 401,
         },
+        error: new Error('Internal server error'),
       },
       'metrics/search': {
         success: {
@@ -92,6 +93,12 @@ const backendSrv = {
 
     if (!response) {
       console.error('Backend request mock not found.');
+    } else if (response instanceof Error) {
+      const defer = $q.defer();
+
+      defer.reject(response);
+
+      return defer.promise;
     }
 
     return $q.when(response || {});

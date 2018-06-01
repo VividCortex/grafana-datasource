@@ -10,11 +10,12 @@ const config = require('../src/config.json');
 const datasourceRequestSpy = sinon.spy(backendSrv, 'datasourceRequest');
 const replaceSpy = sinon.spy(templateSrv, 'replace');
 
-let datasource, errorDatasource;
+let datasource, failureDatasource, errorDatasource;
 
 describe('VividCortex datasource', () => {
   beforeEach(() => {
     datasource = new VividCortexDatasource({ jsonData: { apiToken: 'success' } }, backendSrv, templateSrv, $q);
+    failureDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'failure' } }, backendSrv, templateSrv, $q);
     errorDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'error' } }, backendSrv, templateSrv, $q);
   });
 
@@ -39,9 +40,22 @@ describe('VividCortex datasource', () => {
       });
     });
 
-    it('should let the user know the datasource configuration failed', done => {
-      errorDatasource.testDatasource().then(response => {
+    it('should let the user there was an error with the datasource verification', done => {
+      failureDatasource.testDatasource().then(response => {
         expect(response).to.deep.equal({
+          status: 'error',
+          message:
+            'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
+          title: 'Credentials error',
+        });
+
+        done();
+      });
+    });
+
+    it('should let the user know the datasource configuration failed', done => {
+      errorDatasource.testDatasource().then(error => {
+        expect(error).to.deep.equal({
           status: 'error',
           message:
             'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
@@ -98,12 +112,13 @@ describe('VividCortex datasource', () => {
     });
 
     it('should perform as many API requests as configured targets', done => {
-      const doQuerySpy = sinon.spy(datasource, 'doQuery');
+      const doQuerySpy = sinon.spy(datasource, 'doQuery'),
+        doRequestSpy = sinon.spy(datasource, 'doRequest');
 
       const options = {
         targets: [
-          { target: 'host.queries.*.*.tput', hosts: 'type=mysql' },
-          { target: 'host.queries.*.*.t_us', hosts: 'type=mysql' },
+          { target: 'host.queries.*.*.tput', hosts: 'type=mysql', separateHosts: 1 },
+          { target: 'host.queries.*.*.t_us', hosts: 'type=mysql', separateHosts: 0 },
         ],
         range: {
           from: { unix: () => 123456789, utc: sinon.spy() },
@@ -116,6 +131,8 @@ describe('VividCortex datasource', () => {
         expect(options.range.to.utc.called).to.be.true;
 
         expect(doQuerySpy.callCount).to.equal(2);
+
+        expect(doRequestSpy.callCount).to.equal(4);
 
         expect(response.data).to.have.lengthOf(2);
 
@@ -208,11 +225,11 @@ describe('VividCortex datasource', () => {
 
   describe('#mapQueryResponse()', () => {
     it('should return an empty array if no data was provided', () => {
-      expect(datasource.mapQueryResponse([], 123456789, 987654321)).to.deep.equal({ data: [] });
-      expect(datasource.mapQueryResponse([{ elements: [] }], 123456789, 987654321)).to.deep.equal({ data: [] });
+      expect(datasource.mapQueryResponse([], [], 123456789, 987654321)).to.deep.equal({ data: [] });
+      expect(datasource.mapQueryResponse([{ elements: [] }], [], 123456789, 987654321)).to.deep.equal({ data: [] });
     });
 
-    it('should return an empty array if no data was provided', () => {
+    it('should return an array with the expected format', () => {
       const input = [
         {
           elements: [
@@ -245,7 +262,78 @@ describe('VividCortex datasource', () => {
         ],
       };
 
-      expect(datasource.mapQueryResponse(input, 123456789, 987654321)).to.deep.equal(expectedOutput);
+      expect(datasource.mapQueryResponse(input, [], 123456789, 987654321)).to.deep.equal(expectedOutput);
+    });
+
+    it('should use the host name as the metric when separating by host', () => {
+      const hosts = [
+        {
+          id: 1,
+          name: 'Host 1',
+        },
+        {
+          id: 2,
+          name: 'Host 2',
+        },
+      ];
+
+      const input = [
+        {
+          elements: [
+            {
+              metric: 'host.queries.q.c0f33b4c0n.tput',
+              host: 1,
+              series: [0, 1, 0],
+            },
+          ],
+        },
+        {
+          elements: [
+            {
+              host: 2,
+              metric: 'host.queries.q.b33fav0c4d0.tput',
+              series: [0, 0, 1],
+            },
+          ],
+        },
+      ];
+
+      const expectedOutput = {
+        data: [
+          {
+            target: 'Host 1',
+            datapoints: [[0, 123456789000], [1, 411522633000], [0, 699588477000]],
+          },
+          {
+            target: 'Host 2',
+            datapoints: [[0, 123456789000], [0, 411522633000], [1, 699588477000]],
+          },
+        ],
+      };
+
+      expect(datasource.mapQueryResponse(input, hosts, 123456789, 987654321)).to.deep.equal(expectedOutput);
+    });
+  });
+
+  describe('#getTargetNameFromSeries()', () => {
+    it('should return the metric name if a host is not in the answer', () => {
+      const series = { metric: 'os.cpu.loadavg' };
+
+      expect(datasource.getTargetNameFromSeries(series, [])).to.equal('os.cpu.loadavg');
+    });
+
+    it('should return the host name if a host id is in the answer', () => {
+      const series = { metric: 'os.cpu.loadavg', host: 1 };
+      const hosts = [{ id: 0, name: 'Not me' }, { id: 1, name: 'Host 1' }, { id: 3, name: 'Me neither' }];
+
+      expect(datasource.getTargetNameFromSeries(series, hosts)).to.equal('Host 1');
+    });
+
+    it('should not fail if the host was not found by id', () => {
+      const series = { metric: 'os.cpu.loadavg', host: 4 };
+      const hosts = [{ id: 0, name: 'Not me' }, { id: 1, name: 'Host 1' }, { id: 3, name: 'Me neither' }];
+
+      expect(datasource.getTargetNameFromSeries(series, hosts)).to.equal('Unknown host');
     });
   });
 });
