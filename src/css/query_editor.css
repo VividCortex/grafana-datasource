@@ -18,6 +18,10 @@
   right: 0.775rem;
 }
 
+.vc-host-filter__container {
+  position: relative;
+}
+
 .vc-learn-more__link {
   text-decoration: underline;
 }

@@ -121,6 +121,7 @@ export default class VividCortexDatasource {
       samplesize: calculateSampleSize(from, until, dataPoints),
       until: until,
       host: null,
+      separateHosts: target.separateHosts ? 1 : 0,
     };
 
     const body = {
@@ -130,9 +131,9 @@ export default class VividCortexDatasource {
     const defer = this.$q.defer();
 
     this.getActiveHosts(params.from, params.until).then(hosts => {
-      params.host = this.filterHosts(hosts, target.hosts)
-        .map(host => host.id)
-        .join(',');
+      const filteredHosts = this.filterHosts(hosts, target.hosts);
+
+      params.host = filteredHosts.map(host => host.id).join(',');
 
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
@@ -141,7 +142,7 @@ export default class VividCortexDatasource {
           until: parseInt(response.headers('X-Vc-Meta-Until')),
         }))
         .then(response => {
-          defer.resolve(this.mapQueryResponse(response.metrics, response.from, response.until));
+          defer.resolve(this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
         })
         .catch(error => {
           defer.reject(error);
@@ -219,11 +220,12 @@ export default class VividCortexDatasource {
    * Map a VividCortex series response to Grafana's structure.
    *
    * @param  {Array} series
+   * @param  {Array} hosts
    * @param  {number} from
    * @param  {number} until
    * @return {Array}
    */
-  mapQueryResponse(series: Array<any>, from: number, until: number) {
+  mapQueryResponse(series: Array<any>, hosts: Array<any>, from: number, until: number) {
     if (!series.length || !series[0].elements.length) {
       return { data: [] };
     }
@@ -238,7 +240,7 @@ export default class VividCortexDatasource {
         const sampleSize = (until - from) / values.length;
 
         response.data.push({
-          target: element.metric,
+          target: this.getTargetNameFromSeries(element, hosts),
           datapoints: values.map((value, index) => {
             return [value, (from + index * sampleSize) * 1e3];
           }),
@@ -247,5 +249,23 @@ export default class VividCortexDatasource {
     });
 
     return response;
+  }
+
+  /**
+   * From a time series response, return the appropiate label to identify the target in the graph.
+   * When the response is divided by host, we use the host name, otherwise the metric name.
+   *
+   * @param  {Object} series description
+   * @param  {Array} series description
+   * @return {string}        description
+   */
+  getTargetNameFromSeries(series, hosts: Array<any>) {
+    if (!series.host) {
+      return series.metric;
+    }
+
+    const host = hosts.filter(host => host.id === series.host);
+
+    return host.length ? host[0].name : 'Unknown host';
   }
 }
