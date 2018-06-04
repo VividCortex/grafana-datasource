@@ -94,11 +94,7 @@ const backendSrv = {
     if (!response) {
       console.error('Backend request mock not found.');
     } else if (response instanceof Error) {
-      const defer = $q.defer();
-
-      defer.reject(response);
-
-      return defer.promise;
+      return $q.reject(response);
     }
 
     return $q.when(response || {});
