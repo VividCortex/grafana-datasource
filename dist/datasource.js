@@ -14,7 +14,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
       },
     ],
     execute: function() {
-      momentjs = moment.default ? moment.default : moment;
+      momentjs = moment.default || moment;
       VividCortexDatasource = (function() {
         /** @ngInject */
         function VividCortexDatasource(instanceSettings, backendSrv, templateSrv, $q) {

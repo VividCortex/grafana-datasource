@@ -40,14 +40,14 @@ System.register(['app/plugins/sdk', './css/query_editor.css!'], function(exports
             _this.datasource
               .metricFindQuery(query)
               .then(function(metrics) {
-                _this.loading = false;
                 _this.metricFindDefer.resolve(metrics);
               })
               .catch(function(error) {
                 return _this.metricFindDefer.reject(error);
               })
               .finally(function() {
-                return (_this.metricFindDefer = null);
+                _this.metricFindDefer = null;
+                _this.loading = false;
               });
           }, 250);
           return this.metricFindDefer.promise;
