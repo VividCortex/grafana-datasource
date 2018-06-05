@@ -2,9 +2,13 @@
 import { QueryCtrl } from 'app/plugins/sdk';
 export declare class VividCortexQueryCtrl extends QueryCtrl {
   static templateUrl: string;
-  defaults: {};
+  loading: any;
+  private metricFindDefer;
+  private metricFindTimeout;
+  private $q;
+  private $timeout;
   /** @ngInject **/
-  constructor($scope: any, $injector: any);
+  constructor($scope: any, $injector: any, $q: any, $timeout: any);
   getOptions(query: any): any;
   onChangeInternal(): void;
 }

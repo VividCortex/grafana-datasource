@@ -11,6 +11,14 @@ export default class VividCortexDatasource {
   metricFindQuery(query: string): any;
   query(options: any): any;
   /**
+   * Get the active hosts in a time interval.
+   *
+   * @param  {number} from:
+   * @param  {number} until
+   * @return {Promise}
+   */
+  getActiveHosts(from: number, until: number): any;
+  /**
    * Perform a query-series query for a given target (host and metric) in a time frame.
    *
    * @param  {object} target
@@ -57,15 +65,26 @@ export default class VividCortexDatasource {
    * Map a VividCortex series response to Grafana's structure.
    *
    * @param  {Array} series
+   * @param  {Array} hosts
    * @param  {number} from
    * @param  {number} until
    * @return {Array}
    */
   mapQueryResponse(
     series: Array<any>,
+    hosts: Array<any>,
     from: number,
     until: number
   ): {
     data: any[];
   };
+  /**
+   * From a time series response, return the appropiate label to identify the target in the graph.
+   * When the response is divided by host, we use the host name, otherwise the metric name.
+   *
+   * @param  {Object} series description
+   * @param  {Array} series description
+   * @return {string}        description
+   */
+  getTargetNameFromSeries(series: any, hosts: Array<any>): any;
 }

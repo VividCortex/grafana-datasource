@@ -22,17 +22,38 @@ System.register(['app/plugins/sdk', './css/query_editor.css!'], function(exports
       VividCortexQueryCtrl = (function(_super) {
         __extends(VividCortexQueryCtrl, _super);
         /** @ngInject **/
-        function VividCortexQueryCtrl($scope, $injector) {
+        function VividCortexQueryCtrl($scope, $injector, $q, $timeout) {
+          this.$q = $q;
+          this.$timeout = $timeout;
           _super.call(this, $scope, $injector);
-          this.defaults = {};
           this.target.target = this.target.target || 'select metric';
-          this.target.type = this.target.type || 'timeserie';
+          this.target.type = this.target.type || 'timeseries';
         }
         VividCortexQueryCtrl.prototype.getOptions = function(query) {
-          return this.datasource.metricFindQuery(query || '');
+          var _this = this;
+          if (!this.metricFindDefer) {
+            this.metricFindDefer = this.$q.defer();
+          }
+          this.loading = true;
+          this.$timeout.cancel(this.metricFindTimeout);
+          this.metricFindTimeout = this.$timeout(function() {
+            _this.datasource
+              .metricFindQuery(query)
+              .then(function(metrics) {
+                _this.metricFindDefer.resolve(metrics);
+              })
+              .catch(function(error) {
+                return _this.metricFindDefer.reject(error);
+              })
+              .finally(function() {
+                _this.metricFindDefer = null;
+                _this.loading = false;
+              });
+          }, 250);
+          return this.metricFindDefer.promise;
         };
         VividCortexQueryCtrl.prototype.onChangeInternal = function() {
-          this.panelCtrl.refresh(); // Asks the panel to refresh data.
+          this.panelCtrl.refresh();
         };
         VividCortexQueryCtrl.templateUrl = 'partials/query.editor.html';
         return VividCortexQueryCtrl;

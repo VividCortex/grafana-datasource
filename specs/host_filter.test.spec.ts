@@ -18,6 +18,13 @@ describe('Host filter', () => {
     expect(result).to.have.lengthOf(3);
   });
 
+  it('should return the previous evaluated value when processing an unknown filter', () => {
+    const fakeFilters = [{ type: 'nonexisting' }],
+      result = hosts.filter(host => testHost(host, fakeFilters));
+
+    expect(result).to.have.lengthOf(3);
+  });
+
   describe('Key=value filters', () => {
     it('should filter the hosts by type', () => {
       const config = 'type=mysql',
