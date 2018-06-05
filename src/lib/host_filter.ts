@@ -77,9 +77,8 @@ function testHost(host: any, filters: Array<any>) {
       case 'substring':
         return host.name.indexOf(filter.value) >= 0;
       case 'exclude':
-        return true;
       default:
-        return included;
+        return true;
     }
   }, false);
 }

@@ -18,10 +18,26 @@ const backendSrv = {
       metrics: {
         success: {
           status: 200,
+          data: {
+            data: [
+              { name: 'host.auth', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.callers', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.connections', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.dbs', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.queries', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.samples', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.status', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.tables', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.totals', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.users', firstSeen: 1508354400, lastSeen: 1527698640 },
+              { name: 'host.verbs', firstSeen: 1508354400, lastSeen: 1527698640 },
+            ],
+          },
         },
-        error: {
-          status: 500,
+        failure: {
+          status: 401,
         },
+        error: new Error('Internal server error'),
       },
       'metrics/search': {
         success: {
@@ -77,6 +93,8 @@ const backendSrv = {
 
     if (!response) {
       console.error('Backend request mock not found.');
+    } else if (response instanceof Error) {
+      return $q.reject(response);
     }
 
     return $q.when(response || {});

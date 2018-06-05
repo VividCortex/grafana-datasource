@@ -62,3 +62,7 @@ you can run:
 * For patches: `yarn release:patch` or `npm run release:patch`
 * For minor releases: `yarn release:minor` or `npm run release:minor`
 * For major releases: `yarn release:major` or `npm run release:major`
+
+## Acknowledgments
+
+* CSS loading spinner by [Luke Haas](https://projects.lukehaas.me/css-loaders/)
