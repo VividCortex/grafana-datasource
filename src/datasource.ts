@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { parseFilters, testHost } from './lib/host_filter';
 import { calculateSampleSize } from './lib/helpers';
 
-const momentjs = moment.default ? moment.default : moment;
+const momentjs = moment.default || moment;
 
 export default class VividCortexDatasource {
   private apiToken: string;
