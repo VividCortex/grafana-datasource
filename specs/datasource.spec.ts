@@ -40,7 +40,7 @@ describe('VividCortex datasource', () => {
       });
     });
 
-    it('should let the user there was an error with the datasource verification', done => {
+    it('should let the user know there was an error with the datasource verification', done => {
       failureDatasource.testDatasource().then(response => {
         expect(response).to.deep.equal({
           status: 'error',
