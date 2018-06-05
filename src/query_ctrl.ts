@@ -37,11 +37,13 @@ export class VividCortexQueryCtrl extends QueryCtrl {
       this.datasource
         .metricFindQuery(query)
         .then(metrics => {
-          this.loading = false;
           this.metricFindDefer.resolve(metrics);
         })
         .catch(error => this.metricFindDefer.reject(error))
-        .finally(() => (this.metricFindDefer = null));
+        .finally(() => {
+          this.metricFindDefer = null;
+          this.loading = false;
+        });
     }, 250);
 
     return this.metricFindDefer.promise;
