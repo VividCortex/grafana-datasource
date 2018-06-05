@@ -1,8 +1,11 @@
-System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
-  var host_filter_1, helpers_1;
-  var VividCortexDatasource;
+System.register(['moment', './lib/host_filter', './lib/helpers'], function(exports_1) {
+  var moment, host_filter_1, helpers_1;
+  var momentjs, VividCortexDatasource;
   return {
     setters: [
+      function(moment_1) {
+        moment = moment_1;
+      },
       function(host_filter_1_1) {
         host_filter_1 = host_filter_1_1;
       },
@@ -11,6 +14,7 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
       },
     ],
     execute: function() {
+      momentjs = moment.default ? moment.default : moment;
       VividCortexDatasource = (function() {
         /** @ngInject */
         function VividCortexDatasource(instanceSettings, backendSrv, templateSrv, $q) {
@@ -48,15 +52,28 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
         };
         VividCortexDatasource.prototype.metricFindQuery = function(query) {
           var params = {
-            q: this.interpolateVariables(query),
+            from: momentjs()
+              .utc()
+              .subtract(7, 'days')
+              .unix(),
+            until: momentjs()
+              .utc()
+              .unix(),
+            new: '0',
+            filter: query ? '*' + query + '*' : undefined,
           };
-          return this.doRequest('metrics/search', 'GET', params)
+          return this.doRequest('metrics', 'GET', params)
             .then(function(response) {
               return response.data.data || [];
             })
             .then(function(metrics) {
               return metrics.map(function(metric) {
-                return { text: metric, value: metric };
+                return { text: metric.name, value: metric.name };
+              });
+            })
+            .then(function(metrics) {
+              return metrics.sort(function(a, b) {
+                return a.text === b.text ? 0 : a.text > b.text ? 1 : -1;
               });
             });
         };
@@ -79,6 +96,21 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
         };
         /* Custom methods ----------------------------------------------------------------------------- */
         /**
+         * Get the active hosts in a time interval.
+         *
+         * @param  {number} from:
+         * @param  {number} until
+         * @return {Promise}
+         */
+        VividCortexDatasource.prototype.getActiveHosts = function(from, until) {
+          return this.doRequest('hosts', 'GET', {
+            from: from,
+            until: until,
+          }).then(function(response) {
+            return response.data.data;
+          });
+        };
+        /**
          * Perform a query-series query for a given target (host and metric) in a time frame.
          *
          * @param  {object} target
@@ -94,17 +126,15 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
             samplesize: helpers_1.calculateSampleSize(from, until, dataPoints),
             until: until,
             host: null,
+            separateHosts: target.separateHosts ? 1 : 0,
           };
           var body = {
             metrics: this.transformMetricForQuery(this.interpolateVariables(target.target)),
           };
           var defer = this.$q.defer();
-          this.doRequest('hosts', 'GET', {
-            from: from,
-            until: until,
-          }).then(function(response) {
-            params.host = _this
-              .filterHosts(response.data.data, target.hosts)
+          this.getActiveHosts(params.from, params.until).then(function(hosts) {
+            var filteredHosts = _this.filterHosts(hosts, target.hosts);
+            params.host = filteredHosts
               .map(function(host) {
                 return host.id;
               })
@@ -119,7 +149,7 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
                 };
               })
               .then(function(response) {
-                defer.resolve(_this.mapQueryResponse(response.metrics, response.from, response.until));
+                defer.resolve(_this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
               })
               .catch(function(error) {
                 defer.reject(error);
@@ -201,11 +231,13 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
          * Map a VividCortex series response to Grafana's structure.
          *
          * @param  {Array} series
+         * @param  {Array} hosts
          * @param  {number} from
          * @param  {number} until
          * @return {Array}
          */
-        VividCortexDatasource.prototype.mapQueryResponse = function(series, from, until) {
+        VividCortexDatasource.prototype.mapQueryResponse = function(series, hosts, from, until) {
+          var _this = this;
           if (!series.length || !series[0].elements.length) {
             return { data: [] };
           }
@@ -217,7 +249,7 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
               var values = element.series;
               var sampleSize = (until - from) / values.length;
               response.data.push({
-                target: element.metric,
+                target: _this.getTargetNameFromSeries(element, hosts),
                 datapoints: values.map(function(value, index) {
                   return [value, (from + index * sampleSize) * 1e3];
                 }),
@@ -225,6 +257,23 @@ System.register(['./lib/host_filter', './lib/helpers'], function(exports_1) {
             });
           });
           return response;
+        };
+        /**
+         * From a time series response, return the appropiate label to identify the target in the graph.
+         * When the response is divided by host, we use the host name, otherwise the metric name.
+         *
+         * @param  {Object} series description
+         * @param  {Array} series description
+         * @return {string}        description
+         */
+        VividCortexDatasource.prototype.getTargetNameFromSeries = function(series, hosts) {
+          if (!series.host) {
+            return series.metric;
+          }
+          var host = hosts.filter(function(host) {
+            return host.id === series.host;
+          });
+          return host.length ? host[0].name : 'Unknown host';
         };
         return VividCortexDatasource;
       })();
