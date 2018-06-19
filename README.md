@@ -29,7 +29,7 @@ In the panel configuration, select the VividCortex Data Source:
 
 You will see a row with a dropdown (to select the metric) and a text input (to filter your hosts).
 
-The metrics dropdown has an autocomplete feature, which will fetch more values (if available) after entering a period. For example `host.` will autocomplete to `host.queries`, `host.indexes`, etc.
+The dropdown will show metrics that match what you have typed, which makes searching easier:
 
 ![Metric Autocomplete](https://docs.vividcortex.com/img/docs/grafana-metric-names.png)
 
