@@ -54,13 +54,14 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
           var params = {
             from: momentjs()
               .utc()
-              .subtract(7, 'days')
+              .subtract(24, 'hours')
               .unix(),
             until: momentjs()
               .utc()
               .unix(),
             new: '0',
             filter: query ? '*' + query + '*' : undefined,
+            limit: 10,
           };
           return this.doRequest('metrics', 'GET', params)
             .then(function(response) {
@@ -144,8 +145,8 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
               .then(function(response) {
                 return {
                   metrics: response.data.data || [],
-                  from: parseInt(response.headers('X-Vc-Meta-From')),
-                  until: parseInt(response.headers('X-Vc-Meta-Until')),
+                  from: parseInt(response.headers('X-Vc-Meta-From'), 10),
+                  until: parseInt(response.headers('X-Vc-Meta-Until'), 10),
                 };
               })
               .then(function(response) {

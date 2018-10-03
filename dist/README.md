@@ -5,18 +5,33 @@
 
 ## How to use
 
-Clone or download the repository files and place them in your Grafana plugins folder, typically found in `<path/to/graphana>/data/plugins` or, on Linux systems, the plugin directory is `/var/lib/grafana/plugins`.
-Restart Grafana, log in, and go to **Configuration** > **Data Sources** > **Add data source** and configure your VividCortex API Token.
+First, clone or download this repository's files and place them in your Grafana plugins folder, typically found in `<path/to/graphana>/data/plugins` or, on Linux systems, the plugin directory is `/var/lib/grafana/plugins`. You can place them in a VividCortex folder, such as `/var/lib/grafana/plugins/vividcortex/`.
 
-### Generating an API Token
+Restart Grafana, log in, and go to **Configuration** > **Data Sources** > **Add data source**:
 
-In your VivivCortex dashboard, go to Settings, Api Tokens and generate a new one.
+![Add a Data Source](https://docs.vividcortex.com/img/docs/grafana-add-datasource.png)
+
+Select VividCortex:
+
+![Select VividCortex](https://docs.vividcortex.com/img/docs/grafana-datasource-selection.png)
+
+Enter your VividCortex API token. To generate an API token, log into VividCortex and select the environment you want to pull metrics from. Go to Settings, and under Environment Settings, choose API Tokens.
+
+![Enter API Token](https://docs.vividcortex.com/img/docs/grafana-datasource-vividcortex.png)
+
+Then Save.
 
 ### Configuring your graph
 
-In the panel configuration, after selecting your VividCortex Datasource, you will see a row with a dropdown (to select the metric) and a text input (to filter your hosts).
+In the panel configuration, select the VividCortex Data Source:
 
-The metrics dropdown has an autocomplete feature, which will fetch more values (if available) after entering a period. For example `host.` will autocomplete to `host.queries`, `host.indexes`, etc.
+![Use the VividCortex Data Source](https://docs.vividcortex.com/img/docs/grafana-select-vividcortex.png)
+
+You will see a row with a dropdown (to select the metric) and a text input (to filter your hosts).
+
+The dropdown will show metrics that match what you have typed, which makes searching easier:
+
+![Metric Autocomplete](https://docs.vividcortex.com/img/docs/grafana-metric-names.png)
 
 The hosts filter shares some features with the VividCortex app:
 

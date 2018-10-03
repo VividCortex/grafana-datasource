@@ -3,7 +3,6 @@ import { QueryCtrl } from 'app/plugins/sdk';
 export declare class VividCortexQueryCtrl extends QueryCtrl {
   static templateUrl: string;
   loading: any;
-  private metricFindDefer;
   private metricFindTimeout;
   private $q;
   private $timeout;
