@@ -54,13 +54,14 @@ export default class VividCortexDatasource {
     const params = {
       from: momentjs()
         .utc()
-        .subtract(7, 'days')
+        .subtract(24, 'hours')
         .unix(),
       until: momentjs()
         .utc()
         .unix(),
       new: '0',
       filter: query ? `*${query}*` : undefined,
+      limit: 10,
     };
 
     return this.doRequest('metrics', 'GET', params)
@@ -81,7 +82,7 @@ export default class VividCortexDatasource {
       return this.doQuery(target, options.range.from.unix(), options.range.to.unix(), options.maxDataPoints);
     });
 
-    return this.$q.all(promises).then(function(responses) {
+    return this.$q.all(promises).then(responses => {
       const result = responses.reduce((result, response) => result.concat(response.data), []);
 
       return { data: result };
@@ -138,8 +139,8 @@ export default class VividCortexDatasource {
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
           metrics: response.data.data || [],
-          from: parseInt(response.headers('X-Vc-Meta-From')),
-          until: parseInt(response.headers('X-Vc-Meta-Until')),
+          from: parseInt(response.headers('X-Vc-Meta-From'), 10),
+          until: parseInt(response.headers('X-Vc-Meta-Until'), 10),
         }))
         .then(response => {
           defer.resolve(this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
@@ -158,7 +159,7 @@ export default class VividCortexDatasource {
    * @param  {string} metric
    * @return {string}
    */
-  interpolateVariables(metric: string = '') {
+  interpolateVariables(metric = '') {
     return this.templateSrv.replace(metric, null, 'regex').replace(/\\\./g, '.');
   }
 
@@ -206,7 +207,7 @@ export default class VividCortexDatasource {
    * @param  {string} metric
    * @return {string}
    */
-  transformMetricForQuery(metric: string = '') {
+  transformMetricForQuery(metric = '') {
     const metrics = metric.replace(/[()]/g, '').split('|');
 
     if (metrics.length < 2) {

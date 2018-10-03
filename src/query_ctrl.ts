@@ -8,7 +8,6 @@ export class VividCortexQueryCtrl extends QueryCtrl {
 
   public loading;
 
-  private metricFindDefer;
   private metricFindTimeout;
   private $q;
   private $timeout;
@@ -25,28 +24,28 @@ export class VividCortexQueryCtrl extends QueryCtrl {
   }
 
   getOptions(query) {
-    if (!this.metricFindDefer) {
-      this.metricFindDefer = this.$q.defer();
-    }
+    const defer = this.$q.defer();
 
     this.loading = true;
 
-    this.$timeout.cancel(this.metricFindTimeout);
+    if (this.metricFindTimeout) {
+      this.$timeout.cancel(this.metricFindTimeout);
+    }
 
     this.metricFindTimeout = this.$timeout(() => {
       this.datasource
         .metricFindQuery(query)
         .then(metrics => {
-          this.metricFindDefer.resolve(metrics);
+          defer.resolve(metrics);
         })
-        .catch(error => this.metricFindDefer.reject(error))
+        .catch(error => defer.reject(error))
         .finally(() => {
-          this.metricFindDefer = null;
+          this.metricFindTimeout = null;
           this.loading = false;
         });
     }, 250);
 
-    return this.metricFindDefer.promise;
+    return defer.promise;
   }
 
   onChangeInternal() {
