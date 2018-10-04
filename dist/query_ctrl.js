@@ -31,26 +31,26 @@ System.register(['app/plugins/sdk', './css/query_editor.css!'], function(exports
         }
         VividCortexQueryCtrl.prototype.getOptions = function(query) {
           var _this = this;
-          if (!this.metricFindDefer) {
-            this.metricFindDefer = this.$q.defer();
-          }
+          var defer = this.$q.defer();
           this.loading = true;
-          this.$timeout.cancel(this.metricFindTimeout);
+          if (this.metricFindTimeout) {
+            this.$timeout.cancel(this.metricFindTimeout);
+          }
           this.metricFindTimeout = this.$timeout(function() {
             _this.datasource
               .metricFindQuery(query)
               .then(function(metrics) {
-                _this.metricFindDefer.resolve(metrics);
+                defer.resolve(metrics);
               })
               .catch(function(error) {
-                return _this.metricFindDefer.reject(error);
+                return defer.reject(error);
               })
               .finally(function() {
-                _this.metricFindDefer = null;
+                _this.metricFindTimeout = null;
                 _this.loading = false;
               });
           }, 250);
-          return this.metricFindDefer.promise;
+          return defer.promise;
         };
         VividCortexQueryCtrl.prototype.onChangeInternal = function() {
           this.panelCtrl.refresh();
