@@ -48,6 +48,19 @@ Sample configuration:
 
 ![sample configuration](https://user-images.githubusercontent.com/1069378/39949018-ec4c424c-554e-11e8-8927-181d94c4a100.png)
 
+### Use with Grafana variables
+
+When defining a graph, it's supported in both the metric picker and host filter the use of variables.
+These variables will be interpolated with the currently selected value when the datasource requests for data.
+
+![variables in the query editor](https://user-images.githubusercontent.com/1069378/52145867-f9124f80-2640-11e9-920e-5ed3e314bf13.png)
+
+Variables, with VividCortex as the datasource, will use the `query` field to match with metric names
+(e.g. `mysql.` will match with mysql metrics). Alternatively, you can use the special string `$hosts`
+and get host names as possible values.
+
+Read more about variables in the [Grafana documentation](http://docs.grafana.org/reference/templating/).
+
 ## Development guide
 
 1.  Place this project in your plugins directory or _<grafana folder>/data/plugins_

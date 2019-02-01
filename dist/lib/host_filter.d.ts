@@ -23,5 +23,5 @@ declare function parseFilters(
  * @param  {Array} filters
  * @return {boolean}
  */
-declare function testHost(host: any, filters: Array<any>): any;
+declare function testHost(host: any, filters: any[]): boolean;
 export { parseFilters, testHost };
