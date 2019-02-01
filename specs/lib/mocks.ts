@@ -102,7 +102,7 @@ const backendSrv = {
 };
 
 const templateSrv = {
-  replace: metric => metric,
+  replace: metric => metric.replace('$', ''),
 };
 
 export { backendSrv, templateSrv };

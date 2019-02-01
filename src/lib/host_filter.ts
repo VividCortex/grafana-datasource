@@ -47,40 +47,38 @@ function parseFilters(config: string = '') {
  * @param  {Array} filters
  * @return {boolean}
  */
-function testHost(host: any, filters: Array<any>) {
-  const isExcluded = filters.reduce((excluded, filter) => {
-    if (filter.type === 'exclude' && host.name === filter.value) {
-      return true;
+function testHost(host: any, filters: any[]) {
+  const negativeFilters = filters.filter(filter => filter.type === 'exclude');
+  const positiveFilters = filters.filter(filter => filter.type !== 'exclude');
+
+  for (const filter of negativeFilters) {
+    if (passesFilter(host, filter) === false) {
+      return false;
     }
-
-    return excluded;
-  }, false);
-
-  if (isExcluded) {
-    return false;
   }
 
-  return filters.reduce((included, filter) => {
-    if (included) {
+  for (const filter of positiveFilters) {
+    if (passesFilter(host, filter)) {
       return true;
-    } // Once a filter matched, there is no need to keep evaluating
-
-    if (!filter.value) {
-      return true;
-    } // Include all the hosts by default
-
-    switch (filter.type) {
-      case 'attribute':
-        return host[filter.key] === filter.value;
-      case 'exact':
-        return host.name === filter.value;
-      case 'substring':
-        return host.name.indexOf(filter.value) >= 0;
-      case 'exclude':
-      default:
-        return true;
     }
-  }, false);
+  }
+
+  return positiveFilters.length > 0 ? false : true;
+}
+
+function passesFilter(host, filter) {
+  switch (filter.type) {
+    case 'attribute':
+      return host[filter.key] === filter.value;
+    case 'exact':
+      return host.name === filter.value;
+    case 'substring':
+      return host.name.indexOf(filter.value) >= 0;
+    case 'exclude':
+      return host.name !== filter.value;
+    default:
+      return true;
+  }
 }
 
 export { parseFilters, testHost };

@@ -194,15 +194,18 @@ describe('VividCortex datasource', () => {
   describe('#filterHosts()', () => {
     const hosts = [{ id: 1, name: 'testing-host-1', type: 'mysql' }, { id: 2, name: 'testing-host-2', type: 'mongo' }];
 
-    let filteredHosts;
-
-    before(() => {
-      filteredHosts = datasource.filterHosts(hosts, 'type=mongo');
-    });
-
     it('should filter a set of hosts based in a user provided configuration string', () => {
+      const filteredHosts = datasource.filterHosts(hosts, 'type=mongo');
+
       expect(filteredHosts).to.have.lengthOf(1);
       expect(filteredHosts[0].id).to.equal(2);
+    });
+
+    it('should interpolate variables in the host filter', () => {
+      const filteredHosts = datasource.filterHosts(hosts, '$testing-host-1');
+
+      expect(filteredHosts).to.have.lengthOf(1);
+      expect(filteredHosts[0].id).to.equal(1);
     });
   });
 

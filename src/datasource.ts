@@ -194,8 +194,8 @@ export default class VividCortexDatasource {
    * @param  {string} config
    * @return {Array}
    */
-  filterHosts(hosts: Array<any>, config: string) {
-    const filters = parseFilters(config);
+  filterHosts(hosts: any[], config: string) {
+    const filters = parseFilters(this.templateSrv.replace(config, null, 'regex'));
 
     return hosts.filter(host => testHost(host, filters));
   }
@@ -226,7 +226,7 @@ export default class VividCortexDatasource {
    * @param  {number} until
    * @return {Array}
    */
-  mapQueryResponse(series: Array<any>, hosts: Array<any>, from: number, until: number) {
+  mapQueryResponse(series: any[], hosts: any[], from: number, until: number) {
     if (!series.length || !series[0].elements.length) {
       return { data: [] };
     }
@@ -260,7 +260,7 @@ export default class VividCortexDatasource {
    * @param  {Array} series description
    * @return {string}        description
    */
-  getTargetNameFromSeries(series, hosts: Array<any>) {
+  getTargetNameFromSeries(series, hosts: any[]) {
     if (!series.host) {
       return series.metric;
     }
