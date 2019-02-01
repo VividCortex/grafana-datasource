@@ -100,6 +100,16 @@ describe('VividCortex datasource', () => {
         done();
       });
     });
+
+    it('should return hosts names for variable definition when called with an special string', done => {
+      datasource.metricFindQuery('$hosts').then(response => {
+        expect(response).to.have.lengthOf(1);
+        expect(response[0].text).to.equal('testing-host-1');
+        expect(response[0].value).to.equal('testing-host-1');
+
+        done();
+      });
+    });
   });
 
   describe('#query()', () => {
@@ -206,6 +216,7 @@ describe('VividCortex datasource', () => {
 
       expect(filteredHosts).to.have.lengthOf(1);
       expect(filteredHosts[0].id).to.equal(1);
+      expect(replaceSpy.lastCall.args[0]).to.equal('$testing-host-1');
     });
   });
 

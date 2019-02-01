@@ -64,10 +64,26 @@ export default class VividCortexDatasource {
       limit: 10,
     };
 
+    const sort = result => result.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1));
+
+    /**
+     * Special behavior of metricFindQuery designed to return host names, instead of metric names,
+     * to allow the definition of Grafana template variables (of type query) with dynamic host names.
+     */
+    if (query === '$hosts') {
+      return this.getActiveHosts(params.from, params.until)
+        .then(hosts =>
+          hosts.map(host => {
+            return { text: host.name, value: host.name };
+          })
+        )
+        .then(sort);
+    }
+
     return this.doRequest('metrics', 'GET', params)
       .then(response => response.data.data || [])
       .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
-      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)));
+      .then(sort);
   }
 
   query(options) {
