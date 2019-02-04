@@ -63,6 +63,24 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
             filter: query ? '*' + query + '*' : undefined,
             limit: 10,
           };
+          var sort = function(result) {
+            return result.sort(function(a, b) {
+              return a.text === b.text ? 0 : a.text > b.text ? 1 : -1;
+            });
+          };
+          /**
+           * Special behavior of metricFindQuery designed to return host names, instead of metric names,
+           * to allow the definition of Grafana template variables (of type query) with dynamic host names.
+           */
+          if (query === '$hosts') {
+            return this.getActiveHosts(params.from, params.until)
+              .then(function(hosts) {
+                return hosts.map(function(host) {
+                  return { text: host.name, value: host.name };
+                });
+              })
+              .then(sort);
+          }
           return this.doRequest('metrics', 'GET', params)
             .then(function(response) {
               return response.data.data || [];
@@ -72,11 +90,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                 return { text: metric.name, value: metric.name };
               });
             })
-            .then(function(metrics) {
-              return metrics.sort(function(a, b) {
-                return a.text === b.text ? 0 : a.text > b.text ? 1 : -1;
-              });
-            });
+            .then(sort);
         };
         VividCortexDatasource.prototype.query = function(options) {
           var _this = this;
@@ -206,7 +220,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
          * @return {Array}
          */
         VividCortexDatasource.prototype.filterHosts = function(hosts, config) {
-          var filters = host_filter_1.parseFilters(config);
+          var filters = host_filter_1.parseFilters(this.templateSrv.replace(config, null, 'regex'));
           return hosts.filter(function(host) {
             return host_filter_1.testHost(host, filters);
           });

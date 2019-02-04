@@ -64,10 +64,26 @@ export default class VividCortexDatasource {
       limit: 10,
     };
 
+    const sort = result => result.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1));
+
+    /**
+     * Special behavior of metricFindQuery designed to return host names, instead of metric names,
+     * to allow the definition of Grafana template variables (of type query) with dynamic host names.
+     */
+    if (query === '$hosts') {
+      return this.getActiveHosts(params.from, params.until)
+        .then(hosts =>
+          hosts.map(host => {
+            return { text: host.name, value: host.name };
+          })
+        )
+        .then(sort);
+    }
+
     return this.doRequest('metrics', 'GET', params)
       .then(response => response.data.data || [])
       .then(metrics => metrics.map(metric => ({ text: metric.name, value: metric.name })))
-      .then(metrics => metrics.sort((a, b) => (a.text === b.text ? 0 : a.text > b.text ? 1 : -1)));
+      .then(sort);
   }
 
   query(options) {
@@ -194,8 +210,8 @@ export default class VividCortexDatasource {
    * @param  {string} config
    * @return {Array}
    */
-  filterHosts(hosts: Array<any>, config: string) {
-    const filters = parseFilters(config);
+  filterHosts(hosts: any[], config: string) {
+    const filters = parseFilters(this.templateSrv.replace(config, null, 'regex'));
 
     return hosts.filter(host => testHost(host, filters));
   }
@@ -226,7 +242,7 @@ export default class VividCortexDatasource {
    * @param  {number} until
    * @return {Array}
    */
-  mapQueryResponse(series: Array<any>, hosts: Array<any>, from: number, until: number) {
+  mapQueryResponse(series: any[], hosts: any[], from: number, until: number) {
     if (!series.length || !series[0].elements.length) {
       return { data: [] };
     }
@@ -260,7 +276,7 @@ export default class VividCortexDatasource {
    * @param  {Array} series description
    * @return {string}        description
    */
-  getTargetNameFromSeries(series, hosts: Array<any>) {
+  getTargetNameFromSeries(series, hosts: any[]) {
     if (!series.host) {
       return series.metric;
     }

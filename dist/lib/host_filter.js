@@ -45,34 +45,39 @@ System.register([], function(exports_1) {
    * @return {boolean}
    */
   function testHost(host, filters) {
-    var isExcluded = filters.reduce(function(excluded, filter) {
-      if (filter.type === 'exclude' && host.name === filter.value) {
-        return true;
+    var negativeFilters = filters.filter(function(filter) {
+      return filter.type === 'exclude';
+    });
+    var positiveFilters = filters.filter(function(filter) {
+      return filter.type !== 'exclude';
+    });
+    for (var _i = 0; _i < negativeFilters.length; _i++) {
+      var filter = negativeFilters[_i];
+      if (passesFilter(host, filter) === false) {
+        return false;
       }
-      return excluded;
-    }, false);
-    if (isExcluded) {
-      return false;
     }
-    return filters.reduce(function(included, filter) {
-      if (included) {
+    for (var _a = 0; _a < positiveFilters.length; _a++) {
+      var filter = positiveFilters[_a];
+      if (passesFilter(host, filter)) {
         return true;
-      } // Once a filter matched, there is no need to keep evaluating
-      if (!filter.value) {
-        return true;
-      } // Include all the hosts by default
-      switch (filter.type) {
-        case 'attribute':
-          return host[filter.key] === filter.value;
-        case 'exact':
-          return host.name === filter.value;
-        case 'substring':
-          return host.name.indexOf(filter.value) >= 0;
-        case 'exclude':
-        default:
-          return true;
       }
-    }, false);
+    }
+    return positiveFilters.length > 0 ? false : true;
+  }
+  function passesFilter(host, filter) {
+    switch (filter.type) {
+      case 'attribute':
+        return host[filter.key] === filter.value;
+      case 'exact':
+        return host.name === filter.value;
+      case 'substring':
+        return host.name.indexOf(filter.value) >= 0;
+      case 'exclude':
+        return host.name !== filter.value;
+      default:
+        return true;
+    }
   }
   return {
     setters: [],

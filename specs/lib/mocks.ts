@@ -39,25 +39,6 @@ const backendSrv = {
         },
         error: new Error('Internal server error'),
       },
-      'metrics/search': {
-        success: {
-          data: {
-            data: [
-              'host.auth',
-              'host.callers',
-              'host.connections',
-              'host.dbs',
-              'host.queries',
-              'host.samples',
-              'host.status',
-              'host.tables',
-              'host.totals',
-              'host.users',
-              'host.verbs',
-            ],
-          },
-        },
-      },
       hosts: {
         success: {
           data: {
@@ -86,10 +67,12 @@ const backendSrv = {
       },
     },
   },
-  datasourceRequest: function(options) {
+  datasourceRequest: options => {
     const endpoint = options.url.replace(config.apiUrl, ''),
       apiToken = options.headers.Authorization.replace('Bearer ', ''),
       response = backendSrv.requests[options.method][endpoint][apiToken];
+
+    console.log(`calling ${options.method} ${endpoint}`);
 
     if (!response) {
       console.error('Backend request mock not found.');
@@ -102,7 +85,7 @@ const backendSrv = {
 };
 
 const templateSrv = {
-  replace: metric => metric,
+  replace: metric => metric.replace('$', ''),
 };
 
 export { backendSrv, templateSrv };

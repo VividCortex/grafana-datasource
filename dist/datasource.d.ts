@@ -52,7 +52,7 @@ export default class VividCortexDatasource {
    * @param  {string} config
    * @return {Array}
    */
-  filterHosts(hosts: Array<any>, config: string): any[];
+  filterHosts(hosts: any[], config: string): any[];
   /**
    * Prepare the metric to be properly interpreted by the API. E.g. if Grafana is using template
    * variables and requesting multiple metrics.
@@ -71,8 +71,8 @@ export default class VividCortexDatasource {
    * @return {Array}
    */
   mapQueryResponse(
-    series: Array<any>,
-    hosts: Array<any>,
+    series: any[],
+    hosts: any[],
     from: number,
     until: number
   ): {
@@ -86,5 +86,5 @@ export default class VividCortexDatasource {
    * @param  {Array} series description
    * @return {string}        description
    */
-  getTargetNameFromSeries(series: any, hosts: Array<any>): any;
+  getTargetNameFromSeries(series: any, hosts: any[]): any;
 }
