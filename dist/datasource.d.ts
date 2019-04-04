@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 export default class VividCortexDatasource {
   private apiToken;
+  private apiUrl;
   private backendSrv;
   private templateSrv;
   private $q;
