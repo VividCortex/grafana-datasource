@@ -22,6 +22,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
           this.templateSrv = templateSrv;
           this.$q = $q;
           this.apiToken = instanceSettings.jsonData.apiToken;
+          this.apiUrl = instanceSettings.jsonData.apiUrl || 'https://app.vividcortex.com';
         }
         VividCortexDatasource.prototype.testDatasource = function() {
           var success = {
@@ -206,7 +207,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
               Authorization: 'Bearer ' + this.apiToken,
             },
             params: params,
-            url: 'https://app.vividcortex.com/api/v2/' + endpoint,
+            url: this.apiUrl + '/api/v2/' + endpoint,
             method: method,
             data: body,
           };
