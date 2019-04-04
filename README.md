@@ -21,6 +21,8 @@ Enter your VividCortex API token. To generate an API token, log into VividCortex
 
 Then Save.
 
+**Optional:** if, for any reason, you need to configure a different API URL, you can use the `API URL` field in the datasource configuration. Otherwise you can leave it empty, as it's not required.
+
 ### Configuring your graph
 
 In the panel configuration, select the VividCortex Data Source:
