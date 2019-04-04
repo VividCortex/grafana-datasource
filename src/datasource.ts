@@ -7,6 +7,7 @@ const momentjs = moment.default || moment;
 
 export default class VividCortexDatasource {
   private apiToken: string;
+  private apiUrl: string;
   private backendSrv;
   private templateSrv;
   private $q;
@@ -18,6 +19,7 @@ export default class VividCortexDatasource {
     this.$q = $q;
 
     this.apiToken = instanceSettings.jsonData.apiToken;
+    this.apiUrl = instanceSettings.jsonData.apiUrl || 'https://app.vividcortex.com';
   }
 
   testDatasource() {
@@ -195,7 +197,7 @@ export default class VividCortexDatasource {
         Authorization: 'Bearer ' + this.apiToken,
       },
       params: params,
-      url: 'https://app.vividcortex.com/api/v2/' + endpoint,
+      url: this.apiUrl + '/api/v2/' + endpoint,
       method: method,
       data: body,
     };

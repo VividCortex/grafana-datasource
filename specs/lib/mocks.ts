@@ -68,7 +68,7 @@ const backendSrv = {
     },
   },
   datasourceRequest: options => {
-    const endpoint = options.url.replace(config.apiUrl, ''),
+    const endpoint = options.url.match(/(?:\/api\/v2\/)([\w\W]+)$/)[1],
       apiToken = options.headers.Authorization.replace('Bearer ', ''),
       response = backendSrv.requests[options.method][endpoint][apiToken];
 

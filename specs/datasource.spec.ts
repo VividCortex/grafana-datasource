@@ -10,17 +10,31 @@ const config = require('../src/config.json');
 const datasourceRequestSpy = sinon.spy(backendSrv, 'datasourceRequest');
 const replaceSpy = sinon.spy(templateSrv, 'replace');
 
-let datasource, failureDatasource, errorDatasource;
+let datasource, failureDatasource, errorDatasource, customUrlDatasource;
 
 describe('VividCortex datasource', () => {
   beforeEach(() => {
     datasource = new VividCortexDatasource({ jsonData: { apiToken: 'success' } }, backendSrv, templateSrv, $q);
     failureDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'failure' } }, backendSrv, templateSrv, $q);
     errorDatasource = new VividCortexDatasource({ jsonData: { apiToken: 'error' } }, backendSrv, templateSrv, $q);
+    customUrlDatasource = new VividCortexDatasource(
+      { jsonData: { apiToken: 'success', apiUrl: 'https://custom.app.vividcortex.com' } },
+      backendSrv,
+      templateSrv,
+      $q
+    );
   });
 
   it('should be instantiable', () => {
     expect(datasource).not.to.be.undefined;
+  });
+
+  it('should allow custom API URLs', done => {
+    customUrlDatasource.testDatasource().then(response => {
+      expect(datasourceRequestSpy.lastCall.args[0].url).to.equal('https://custom.app.vividcortex.com/api/v2/metrics');
+
+      done();
+    });
   });
 
   describe('#testDatasource()', () => {
