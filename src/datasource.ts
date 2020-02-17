@@ -25,7 +25,7 @@ export default class VividCortexDatasource {
   testDatasource() {
     const success = {
         status: 'success',
-        message: 'Your VividCortex datasource was successfully configured.',
+        message: 'Your SolarWinds DPM datasource was successfully configured.',
         title: 'Success',
       },
       error = {
@@ -236,7 +236,7 @@ export default class VividCortexDatasource {
   }
 
   /**
-   * Map a VividCortex series response to Grafana's structure.
+   * Map a DPM series response to Grafana's structure.
    *
    * @param  {Array} series
    * @param  {Array} hosts

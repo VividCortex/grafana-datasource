@@ -1,21 +1,21 @@
 [![CircleCI](https://circleci.com/gh/VividCortex/grafana-datasource/tree/master.svg?style=svg&circle-token=2d19ab43f02c9fffd9ac06fd3fe241b0bad2f214)](https://circleci.com/gh/VividCortex/grafana-datasource/tree/master)
 [![codecov](https://codecov.io/gh/VividCortex/grafana-datasource/branch/develop/graph/badge.svg?token=GbWKRAvo3O)](https://codecov.io/gh/VividCortex/grafana-datasource)
 
-# VividCortex Metrics Datasource Plugin
+# SolarWinds DPM Metrics Datasource Plugin
 
 ## How to use
 
-First, clone or download this repository's files and place them in your Grafana plugins folder, typically found in `<path/to/graphana>/data/plugins` or, on Linux systems, the plugin directory is `/var/lib/grafana/plugins`. You can place them in a VividCortex folder, such as `/var/lib/grafana/plugins/vividcortex/`.
+First, clone or download this repository's files and place them in your Grafana plugins folder, typically found in `<path/to/grafana>/data/plugins` or, on Linux systems, the plugin directory is `/var/lib/grafana/plugins`. You can place them in a DPM folder, such as `/var/lib/grafana/plugins/dpm/`.
 
 Restart Grafana, log in, and go to **Configuration** > **Data Sources** > **Add data source**:
 
 ![Add a Data Source](https://docs.vividcortex.com/img/docs/grafana-add-datasource.png)
 
-Select VividCortex:
+Select SolarWinds DPM:
 
-![Select VividCortex](https://docs.vividcortex.com/img/docs/grafana-datasource-selection.png)
+![Select SolarWinds DPM](https://docs.vividcortex.com/img/docs/grafana-datasource-selection.png)
 
-Enter your VividCortex API token. To generate an API token, log into VividCortex and select the environment you want to pull metrics from. Go to Settings, and under Environment Settings, choose API Tokens.
+Enter your DPM API token. To generate an API token, log into SolarWinds DPM and select the environment you want to pull metrics from. Go to Settings, and under Environment Settings, choose API Tokens.
 
 ![Enter API Token](https://docs.vividcortex.com/img/docs/grafana-datasource-vividcortex.png)
 
@@ -25,9 +25,9 @@ Then Save.
 
 ### Configuring your graph
 
-In the panel configuration, select the VividCortex Data Source:
+In the panel configuration, select the SolarWinds DPM Data Source:
 
-![Use the VividCortex Data Source](https://docs.vividcortex.com/img/docs/grafana-select-vividcortex.png)
+![Use the SolarWinds DPM Data Source](https://docs.vividcortex.com/img/docs/grafana-select-vividcortex.png)
 
 You will see a row with a dropdown (to select the metric) and a text input (to filter your hosts).
 
@@ -35,7 +35,7 @@ The dropdown will show metrics that match what you have typed, which makes searc
 
 ![Metric Autocomplete](https://docs.vividcortex.com/img/docs/grafana-metric-names.png)
 
-The hosts filter shares some features with the VividCortex app:
+The hosts filter shares some features with the DPM app:
 
 * By default, if you type _api_, any host whose name includes the substring _api_ will become part of the set of active hosts.
 * You can match hostnames exactly by wrapping them with the double quotes sign. The string _"api2"_, for example, will match a host named _api2_ but not one named _api20_.
@@ -57,7 +57,7 @@ These variables will be interpolated with the currently selected value when the 
 
 ![variables in the query editor](https://user-images.githubusercontent.com/1069378/52145867-f9124f80-2640-11e9-920e-5ed3e314bf13.png)
 
-Variables, with VividCortex as the datasource, will use the `query` field to match with metric names
+Variables, with SolarWinds DPM as the datasource, will use the `query` field to match with metric names
 (e.g. `mysql.` will match with mysql metrics). Alternatively, you can use the special string `$hosts`
 and get host names as possible values.
 
