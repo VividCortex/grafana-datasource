@@ -4,23 +4,31 @@
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-9">API Token</span>
-      <input class="gf-form-input width-30" type="text" ng-model="ctrl.current.jsonData.apiToken" placeholder="API Token generated in your DPM account settings"></input>
+      <input
+        class="gf-form-input width-30"
+        type="text"
+        ng-model="ctrl.current.jsonData.apiToken"
+        placeholder="API Token generated in your DPM account settings"
+      />
       <info-popover mode="right-absolute">
-          <p>
-            In your SolarWinds DPM account go to Settings, API Tokens and create a new token to use in
-            your Grafana datasource.
-          </p>
+        <p>
+          In your SolarWinds DPM account go to Settings, API Tokens and create a new token to use in your Grafana
+          datasource.
+        </p>
       </info-popover>
     </div>
   </div>
   <div class="gf-form-inline">
     <div class="gf-form">
       <span class="gf-form-label width-9">API URL</span>
-      <input class="gf-form-input width-30" type="text" ng-model="ctrl.current.jsonData.apiUrl" placeholder="Custom API url"></input>
+      <input
+        class="gf-form-input width-30"
+        type="text"
+        ng-model="ctrl.current.jsonData.apiUrl"
+        placeholder="Custom API url"
+      />
       <info-popover mode="right-absolute">
-          <p>
-            Optional custom API URL. If not completed, it defaults to <strong>https://app.vividcortex.com</strong>.
-          </p>
+        <p>Optional custom API URL. If not completed, it defaults to <strong>https://app.vividcortex.com</strong>.</p>
       </info-popover>
     </div>
   </div>
