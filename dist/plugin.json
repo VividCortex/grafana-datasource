@@ -1,20 +1,20 @@
 {
   "type": "datasource",
-  "name": "VividCortex",
+  "name": "SolarWinds DPM",
   "id": "vividcortex-metrics-datasource",
 
   "info": {
-    "description": "Datasource plugin for VividCortex database monitoring metrics",
+    "description": "Datasource plugin for SolarWinds DPM metrics",
     "author": {
-      "name": "VividCortex",
+      "name": "SolarWinds DPM",
       "url": "http://vividcortex.com"
     },
-    "keywords": ["vividcortex", "metrics", "datasource", "database", "monitoring"],
+    "keywords": ["solarwinds", "dpm", "metrics", "datasource", "database", "monitoring"],
     "logos": {
-      "small": "img/vividcortex.svg",
-      "large": "img/vividcortex.svg"
+      "small": "img/swi-logo.svg",
+      "large": "img/swi-logo.svg"
     },
-    "links": [{ "name": "VividCortex", "url": "https://github.com/vividcortex/grafana-metrics-datasource" }],
+    "links": [{ "name": "SolarWinds DPM Datasource", "url": "https://github.com/vividcortex/grafana-metrics-datasource" }],
     "version": "0.0.1",
     "updated": "2018-03-14"
   },
