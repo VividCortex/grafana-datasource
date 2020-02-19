@@ -8,7 +8,6 @@
     "test": "mocha -r ts-node/register specs/**/*.spec.ts",
     "test:coverage": "nyc mocha -r ts-node/register specs/**/*.spec.ts",
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
-    "precommit": "pretty-quick --staged",
     "lint": "yarn eslint src/*.ts src/**/*.ts"
   },
   "author": "VividCortex",
@@ -32,6 +31,11 @@
       "text"
     ],
     "all": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   },
   "devDependencies": {
     "@types/chai": "^4.2.3",
