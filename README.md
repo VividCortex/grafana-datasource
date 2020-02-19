@@ -88,12 +88,7 @@ you can merge it to master.
 
 ### Release
 
-We follow the [Semantic Versioning](https://semver.org/) guidelines. Depending on the type of release,
-you can run:
-
-- For patches: `yarn release:patch` or `npm run release:patch`
-- For minor releases: `yarn release:minor` or `npm run release:minor`
-- For major releases: `yarn release:major` or `npm run release:major`
+We follow the [Semantic Versioning](https://semver.org/) guidelines.
 
 ## Acknowledgments
 
