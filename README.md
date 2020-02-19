@@ -13,13 +13,15 @@ Restart Grafana, log in, and go to **Configuration** > **Data Sources** > **Add 
 
 Select SolarWinds DPM:
 
-![Select SolarWinds DPM](https://docs.vividcortex.com/img/docs/grafana-datasource-selection.png)
+![Select SolarWinds DPM](https://user-images.githubusercontent.com/1069378/74848128-25fdd700-5316-11ea-9a17-64894a26450a.png)
 
 Enter your DPM API token. To generate an API token, log into SolarWinds DPM and select the environment you want to pull metrics from. Go to Settings, and under Environment Settings, choose API Tokens.
 
-![Enter API Token](https://docs.vividcortex.com/img/docs/grafana-datasource-vividcortex.png)
+![Enter API Token](https://user-images.githubusercontent.com/1069378/74848172-31510280-5316-11ea-90c0-4383d0297188.png)
 
-Then Save.
+Then Save. It should display a success message if the configured token is working.
+
+![Successfully saved](https://user-images.githubusercontent.com/1069378/74848176-33b35c80-5316-11ea-9e0d-35917f444063.png)
 
 **Optional:** if, for any reason, you need to configure a different API URL, you can use the `API URL` field in the datasource configuration. Otherwise you can leave it empty, as it's not required.
 
@@ -27,20 +29,20 @@ Then Save.
 
 In the panel configuration, select the SolarWinds DPM Data Source:
 
-![Use the SolarWinds DPM Data Source](https://docs.vividcortex.com/img/docs/grafana-select-vividcortex.png)
+![Use the SolarWinds DPM Data Source](https://user-images.githubusercontent.com/1069378/74848202-3746e380-5316-11ea-9be6-10cc58c090b5.png)
 
 You will see a row with a dropdown (to select the metric) and a text input (to filter your hosts).
 
 The dropdown will show metrics that match what you have typed, which makes searching easier:
 
-![Metric Autocomplete](https://docs.vividcortex.com/img/docs/grafana-metric-names.png)
+![Metric Autocomplete](https://user-images.githubusercontent.com/1069378/74848227-3c0b9780-5316-11ea-8e23-232b1ace31b7.png)
 
 The hosts filter shares some features with the DPM app:
 
-* By default, if you type _api_, any host whose name includes the substring _api_ will become part of the set of active hosts.
-* You can match hostnames exactly by wrapping them with the double quotes sign. The string _"api2"_, for example, will match a host named _api2_ but not one named _api20_.
-* You can exclude hosts from the selection by negating them with a minus sign. For example, _-"api20"_.
-* You can select hosts by their type (os, mysql, pgsql, redis and mongo at present), with syntax such as _type=os_ or _type=mysql_.
+- By default, if you type _api_, any host whose name includes the substring _api_ will become part of the set of active hosts.
+- You can match hostnames exactly by wrapping them with the double quotes sign. The string _"api2"_, for example, will match a host named _api2_ but not one named _api20_.
+- You can exclude hosts from the selection by negating them with a minus sign. For example, _-"api20"_.
+- You can select hosts by their type (os, mysql, pgsql, redis and mongo at present), with syntax such as _type=os_ or _type=mysql_.
 
 Select a metric, filter your desired hosts and click on the `eye` icon to preview.
 
@@ -48,7 +50,7 @@ Select a metric, filter your desired hosts and click on the `eye` icon to previe
 
 Sample configuration:
 
-![sample configuration](https://user-images.githubusercontent.com/1069378/39949018-ec4c424c-554e-11e8-8927-181d94c4a100.png)
+![sample configuration](https://user-images.githubusercontent.com/1069378/74848236-3e6df180-5316-11ea-942f-bbccddb87f47.png)
 
 ### Use with Grafana variables
 
@@ -89,10 +91,10 @@ you can merge it to master.
 We follow the [Semantic Versioning](https://semver.org/) guidelines. Depending on the type of release,
 you can run:
 
-* For patches: `yarn release:patch` or `npm run release:patch`
-* For minor releases: `yarn release:minor` or `npm run release:minor`
-* For major releases: `yarn release:major` or `npm run release:major`
+- For patches: `yarn release:patch` or `npm run release:patch`
+- For minor releases: `yarn release:minor` or `npm run release:minor`
+- For major releases: `yarn release:major` or `npm run release:major`
 
 ## Acknowledgments
 
-* CSS loading spinner by [Luke Haas](https://projects.lukehaas.me/css-loaders/)
+- CSS loading spinner by [Luke Haas](https://projects.lukehaas.me/css-loaders/)
