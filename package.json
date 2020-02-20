@@ -8,14 +8,7 @@
     "test": "mocha -r ts-node/register specs/**/*.spec.ts",
     "test:coverage": "nyc mocha -r ts-node/register specs/**/*.spec.ts",
     "coverage:report": "nyc report --reporter=text-lcov > coverage.lcov",
-    "precommit": "pretty-quick --staged",
-    "lint": "yarn eslint src/*.ts src/**/*.ts",
-    "bump:patch": "npm-bump patch",
-    "bump:minor": "npm-bump minor",
-    "bump:major": "npm-bump major",
-    "release:patch": "npm-run-all build bump:patch",
-    "release:minor": "npm-run-all build bump:minor",
-    "release:major": "npm-run-all build bump:major"
+    "lint": "yarn eslint src/*.ts src/**/*.ts"
   },
   "author": "VividCortex",
   "license": "MIT",
@@ -39,6 +32,11 @@
     ],
     "all": true
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
   "devDependencies": {
     "@types/chai": "^4.2.3",
     "@types/lodash": "^4.14.138",
@@ -47,7 +45,7 @@
     "@types/sinon": "^7.0.13",
     "@typescript-eslint/parser": "^2.3.0",
     "chai": "^4.2.0",
-    "codecov": "^3.5.0",
+    "codecov": "^3.6.5",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.1",
@@ -60,7 +58,6 @@
     "husky": "^3.0.5",
     "load-grunt-tasks": "^5.1.0",
     "mocha": "^6.2.0",
-    "npm-bump": "^0.0.25",
     "nyc": "^14.1.1",
     "plugin-typescript": "^8.0.0",
     "prettier": "1.18.2",

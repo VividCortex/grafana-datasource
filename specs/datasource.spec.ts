@@ -42,7 +42,7 @@ describe('VividCortex datasource', () => {
       datasource.testDatasource().then(response => {
         expect(response).to.deep.equal({
           status: 'success',
-          message: 'Your VividCortex datasource was successfully configured.',
+          message: 'Your SolarWinds DPM datasource was successfully configured.',
           title: 'Success',
         });
 

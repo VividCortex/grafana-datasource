@@ -4,18 +4,14 @@
  * @param  {string} config
  * @return {Array}
  */
-declare function parseFilters(
-  config?: string
-): (
-  | {
-      type: string;
-      key: string;
-      value: string;
-    }
-  | {
-      type: string;
-      value: string;
-    })[];
+declare function parseFilters(config?: string): ({
+    type: string;
+    key: string;
+    value: string;
+} | {
+    type: string;
+    value: string;
+})[];
 /**
  * Apply an array of filter rules to a host. True means the host passes the filters.
  *
