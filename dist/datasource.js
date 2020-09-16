@@ -33,12 +33,15 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                         message: 'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
                         title: 'Credentials error',
                     };
-                    return this.doRequest('metrics', 'GET', { limit: 1 }).then(function (response) {
+                    return this.doRequest('metrics', 'GET', { limit: 1 })
+                        .then(function (response) {
                         if (response.status === 200) {
                             return success;
                         }
                         return error;
-                    }, function () {
+                    })
+                        .catch(function (response) {
+                        console.error(response);
                         return error;
                     });
                 };
@@ -136,13 +139,14 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                         _this.doRequest('metrics/query-series', 'POST', params, body)
                             .then(function (response) { return ({
                             metrics: response.data.data || [],
-                            from: parseInt(response.headers('X-Vc-Meta-From'), 10),
-                            until: parseInt(response.headers('X-Vc-Meta-Until'), 10),
+                            from: parseInt(_this.readResponseHeaders(response.headers, 'X-Vc-Meta-From'), 10),
+                            until: parseInt(_this.readResponseHeaders(response.headers, 'X-Vc-Meta-Until'), 10),
                         }); })
                             .then(function (response) {
                             defer.resolve(_this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
                         })
                             .catch(function (error) {
+                            console.error(error);
                             defer.reject(error);
                         });
                     });
@@ -169,7 +173,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                  */
                 VividCortexDatasource.prototype.doRequest = function (endpoint, method, params, body) {
                     if (params === void 0) { params = {}; }
-                    if (body === void 0) { body = {}; }
+                    if (body === void 0) { body = undefined; }
                     var options = {
                         headers: {
                             'Content-Type': 'application/json',
@@ -181,6 +185,12 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                         data: body,
                     };
                     return this.backendSrv.datasourceRequest(options);
+                };
+                VividCortexDatasource.prototype.readResponseHeaders = function (headers, attribute) {
+                    if (typeof headers === 'function') {
+                        return headers(attribute);
+                    }
+                    return headers.get(attribute);
                 };
                 /**
                  * Take an array of hosts and apply the configured filters.

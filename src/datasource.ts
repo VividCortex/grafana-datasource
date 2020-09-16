@@ -35,17 +35,17 @@ export default class VividCortexDatasource {
         title: 'Credentials error',
       };
 
-    return this.doRequest('metrics', 'GET', { limit: 1 }).then(
-      response => {
+    return this.doRequest('metrics', 'GET', { limit: 1 })
+      .then(response => {
         if (response.status === 200) {
           return success;
         }
         return error;
-      },
-      () => {
+      })
+      .catch(response => {
+        console.error(response);
         return error;
-      }
-    );
+      });
   }
 
   annotationQuery() {
@@ -157,13 +157,14 @@ export default class VividCortexDatasource {
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
           metrics: response.data.data || [],
-          from: parseInt(response.headers('X-Vc-Meta-From'), 10),
-          until: parseInt(response.headers('X-Vc-Meta-Until'), 10),
+          from: parseInt(this.readResponseHeaders(response.headers, 'X-Vc-Meta-From'), 10),
+          until: parseInt(this.readResponseHeaders(response.headers, 'X-Vc-Meta-Until'), 10),
         }))
         .then(response => {
           defer.resolve(this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
         })
         .catch(error => {
+          console.error(error);
           defer.reject(error);
         });
     });
@@ -190,7 +191,7 @@ export default class VividCortexDatasource {
    * @param  {Object} body
    * @return {Promise}
    */
-  doRequest(endpoint, method, params = {}, body = {}) {
+  doRequest(endpoint, method, params = {}, body = undefined) {
     const options = {
       headers: {
         'Content-Type': 'application/json',
@@ -203,6 +204,14 @@ export default class VividCortexDatasource {
     };
 
     return this.backendSrv.datasourceRequest(options);
+  }
+
+  readResponseHeaders(headers, attribute: string) {
+    if (typeof headers === 'function') {
+      return headers(attribute);
+    }
+
+    return headers.get(attribute);
   }
 
   /**
