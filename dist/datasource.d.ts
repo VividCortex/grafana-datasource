@@ -45,7 +45,8 @@ export default class VividCortexDatasource {
      * @param  {Object} body
      * @return {Promise}
      */
-    doRequest(endpoint: any, method: any, params?: {}, body?: {}): any;
+    doRequest(endpoint: any, method: any, params?: {}, body?: any): any;
+    readResponseHeaders(headers: any, attribute: string): any;
     /**
      * Take an array of hosts and apply the configured filters.
      *
