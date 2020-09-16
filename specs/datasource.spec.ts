@@ -48,7 +48,7 @@ describe('VividCortex datasource', () => {
 
         expect(datasourceRequestSpy.lastCall.args[0].method).to.equal('GET');
         expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics');
-        expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal({});
+        expect(datasourceRequestSpy.lastCall.args[0].data).to.equal(undefined);
 
         done();
       });
@@ -98,7 +98,7 @@ describe('VividCortex datasource', () => {
 
         expect(datasourceRequestSpy.lastCall.args[0].method).to.equal('GET');
         expect(datasourceRequestSpy.lastCall.args[0].url).to.equal(config.apiUrl + 'metrics');
-        expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal({});
+        expect(datasourceRequestSpy.lastCall.args[0].data).to.equal(undefined);
         expect(datasourceRequestSpy.lastCall.args[0].params['new']).to.equal('0');
         expect(datasourceRequestSpy.lastCall.args[0].params['filter']).to.equal('*host.*');
 

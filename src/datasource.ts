@@ -35,18 +35,17 @@ export default class VividCortexDatasource {
         title: 'Credentials error',
       };
 
-    return this.doRequest('metrics', 'GET', { limit: 1 }).then(
-      response => {
+    return this.doRequest('metrics', 'GET', { limit: 1 })
+      .then(response => {
         if (response.status === 200) {
           return success;
         }
         return error;
-      },
-      error => {
-        console.error(error);
+      })
+      .catch(response => {
+        console.error(response);
         return error;
-      }
-    );
+      });
   }
 
   annotationQuery() {
