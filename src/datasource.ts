@@ -158,8 +158,8 @@ export default class VividCortexDatasource {
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
           metrics: response.data.data || [],
-          from: parseInt(response.headers.get('X-Vc-Meta-From'), 10),
-          until: parseInt(response.headers.get('X-Vc-Meta-Until'), 10),
+          from: parseInt(this.readResponseHeaders(response.headers, 'X-Vc-Meta-From'), 10),
+          until: parseInt(this.readResponseHeaders(response.headers, 'X-Vc-Meta-Until'), 10),
         }))
         .then(response => {
           defer.resolve(this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
@@ -205,6 +205,14 @@ export default class VividCortexDatasource {
     };
 
     return this.backendSrv.datasourceRequest(options);
+  }
+
+  readResponseHeaders(headers, attribute: string) {
+    if (typeof headers === 'function') {
+      return headers(attribute);
+    }
+
+    return headers.get(attribute);
   }
 
   /**
