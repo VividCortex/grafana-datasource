@@ -42,7 +42,8 @@ export default class VividCortexDatasource {
         }
         return error;
       },
-      () => {
+      error => {
+        console.error(error);
         return error;
       }
     );
@@ -157,13 +158,14 @@ export default class VividCortexDatasource {
       this.doRequest('metrics/query-series', 'POST', params, body)
         .then(response => ({
           metrics: response.data.data || [],
-          from: parseInt(response.headers('X-Vc-Meta-From'), 10),
-          until: parseInt(response.headers('X-Vc-Meta-Until'), 10),
+          from: parseInt(response.headers.get('X-Vc-Meta-From'), 10),
+          until: parseInt(response.headers.get('X-Vc-Meta-Until'), 10),
         }))
         .then(response => {
           defer.resolve(this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
         })
         .catch(error => {
+          console.error(error);
           defer.reject(error);
         });
     });
@@ -190,7 +192,7 @@ export default class VividCortexDatasource {
    * @param  {Object} body
    * @return {Promise}
    */
-  doRequest(endpoint, method, params = {}, body = {}) {
+  doRequest(endpoint, method, params = {}, body = undefined) {
     const options = {
       headers: {
         'Content-Type': 'application/json',
