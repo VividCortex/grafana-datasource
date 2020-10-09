@@ -1,6 +1,5 @@
 ///<reference path='../node_modules/grafana-sdk-mocks/app/headers/common.d.ts' />
 import * as moment from 'moment';
-import { parseFilters, testHost } from './lib/host_filter';
 import { calculateSampleSize } from './lib/helpers';
 
 const momentjs = moment.default || moment;
@@ -139,29 +138,22 @@ export default class VividCortexDatasource {
       from: from,
       samplesize: calculateSampleSize(from, until, dataPoints),
       until: until,
-      host: null,
+      host: target.hosts,
       separateHosts: target.separateHosts ? 1 : 0,
-    };
-
-    const body = {
       metrics: this.transformMetricForQuery(this.interpolateVariables(target.target)),
     };
 
     const defer = this.$q.defer();
 
     this.getActiveHosts(params.from, params.until).then(hosts => {
-      const filteredHosts = this.filterHosts(hosts, target.hosts);
-
-      params.host = filteredHosts.map(host => host.id).join(',');
-
-      this.doRequest('metrics/query-series', 'POST', params, body)
+      this.doRequest('metrics/query-series', 'GET', params)
         .then(response => ({
           metrics: response.data.data || [],
           from: parseInt(this.readResponseHeaders(response.headers, 'X-Vc-Meta-From'), 10),
           until: parseInt(this.readResponseHeaders(response.headers, 'X-Vc-Meta-Until'), 10),
         }))
         .then(response => {
-          defer.resolve(this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
+          defer.resolve(this.mapQueryResponse(response.metrics, hosts, response.from, response.until));
         })
         .catch(error => {
           console.error(error);
@@ -174,11 +166,8 @@ export default class VividCortexDatasource {
 
   /**
    * Interpolate Grafana variables and strip scape characters.
-   *
-   * @param  {string} metric
-   * @return {string}
    */
-  interpolateVariables(metric = '') {
+  interpolateVariables(metric: string = ''): string {
     return this.templateSrv.replace(metric, null, 'regex').replace(/\\\./g, '.');
   }
 
@@ -215,26 +204,10 @@ export default class VividCortexDatasource {
   }
 
   /**
-   * Take an array of hosts and apply the configured filters.
-   *
-   * @param  {Array}  hosts
-   * @param  {string} config
-   * @return {Array}
-   */
-  filterHosts(hosts: any[], config: string) {
-    const filters = parseFilters(this.templateSrv.replace(config, null, 'regex'));
-
-    return hosts.filter(host => testHost(host, filters));
-  }
-
-  /**
    * Prepare the metric to be properly interpreted by the API. E.g. if Grafana is using template
    * variables and requesting multiple metrics.
-   *
-   * @param  {string} metric
-   * @return {string}
    */
-  transformMetricForQuery(metric = '') {
+  transformMetricForQuery(metric: string = ''): string {
     const metrics = metric.replace(/[()]/g, '').split('|');
 
     if (metrics.length < 2) {
