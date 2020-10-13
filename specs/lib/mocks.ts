@@ -46,8 +46,6 @@ const backendSrv = {
           },
         },
       },
-    },
-    POST: {
       'metrics/query-series': {
         success: {
           data: {

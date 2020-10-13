@@ -197,40 +197,17 @@ describe('VividCortex datasource', () => {
       samplesize: 12,
       until: 987654321,
       host: '1,2,3',
-    };
-
-    const body = {
       metrics: 'host.queries.q.c0ff33.tput',
     };
 
     beforeEach(() => {
-      datasource.doRequest('metrics/query-series', 'POST', params, body);
+      datasource.doRequest('metrics/query-series', 'GET', params);
     });
 
     it('should call the backend service with the correct parameters', () => {
       expect(datasourceRequestSpy.lastCall.args[0].headers['Content-Type']).to.equal('application/json');
       expect(datasourceRequestSpy.lastCall.args[0].headers.Authorization).to.equal('Bearer success');
       expect(datasourceRequestSpy.lastCall.args[0].params).to.deep.equal(params);
-      expect(datasourceRequestSpy.lastCall.args[0].data).to.deep.equal(body);
-    });
-  });
-
-  describe('#filterHosts()', () => {
-    const hosts = [{ id: 1, name: 'testing-host-1', type: 'mysql' }, { id: 2, name: 'testing-host-2', type: 'mongo' }];
-
-    it('should filter a set of hosts based in a user provided configuration string', () => {
-      const filteredHosts = datasource.filterHosts(hosts, 'type=mongo');
-
-      expect(filteredHosts).to.have.lengthOf(1);
-      expect(filteredHosts[0].id).to.equal(2);
-    });
-
-    it('should interpolate variables in the host filter', () => {
-      const filteredHosts = datasource.filterHosts(hosts, '$testing-host-1');
-
-      expect(filteredHosts).to.have.lengthOf(1);
-      expect(filteredHosts[0].id).to.equal(1);
-      expect(replaceSpy.lastCall.args[0]).to.equal('$testing-host-1');
     });
   });
 
