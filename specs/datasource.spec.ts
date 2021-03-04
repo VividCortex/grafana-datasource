@@ -59,7 +59,7 @@ describe('VividCortex datasource', () => {
         expect(response).to.deep.equal({
           status: 'error',
           message:
-            'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
+            'The configuration test was not successful. Please check your API token and Internet access and try again.',
           title: 'Credentials error',
         });
 
@@ -72,7 +72,7 @@ describe('VividCortex datasource', () => {
         expect(error).to.deep.equal({
           status: 'error',
           message:
-            'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
+            'The configuration test was not successful. Please check your API token and Internet access and try again.',
           title: 'Credentials error',
         });
 
