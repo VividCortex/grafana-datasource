@@ -1,6 +1,12 @@
 <div>
   <p>
-    <a class="vc-learn-more__link" target="_blank" rel="noopener" href="https://docs.vividcortex.com/general-reference/metric-categories/">Learn more</a>
+    <a
+      class="vc-learn-more__link"
+      target="_blank"
+      rel="noopener"
+      href="https://docs.vividcortex.com/general-reference/metric-categories/"
+      >Learn more</a
+    >
     about DPM metric categories and how to use them.
   </p>
 </div>
@@ -15,29 +21,59 @@
           </div>
         </div>
 
-        <gf-form-dropdown model="ctrl.target.target"
+        <gf-form-dropdown
+          model="ctrl.target.target"
           allow-custom="true"
           lookup-text="true"
           get-options="ctrl.getOptions($query)"
-          on-change="ctrl.onChangeInternal()">
+          on-change="ctrl.onChangeInternal()"
+        >
         </gf-form-dropdown>
 
         <div class="vc-host-filter__container">
-          <input class="gf-form-input width-30" type="text" ng-model="ctrl.target.hosts" placeholder="Filter your hosts by name or type"/>
+          <input
+            class="gf-form-input width-30"
+            type="text"
+            ng-model="ctrl.target.hosts"
+            placeholder="Filter your hosts by name or type"
+          />
 
           <info-popover mode="right-absolute">
-              <ul>
-                <li>By default, if you type <em>api</em>, any host whose name includes the substring api will become part of the set of active hosts. </li>
-                <li>You can match hostnames exactly by wrapping them with the double quotes sign. The string <em>"api2"</em>, for example, will match a host named <em>api2</em> but not one named <em>api20</em>.</li>
-                <li>You can exclude hosts from the selection by negating them with a minus sign. For example, <em>-"api20"</em>.</li>
-                <li>You can select hosts by their type (os, mysql, pgsql, redis and mongo at present), with syntax such as <em>type=os</em> or <em>type=mysql</em>.</li>
-              </ul>
+            <ul>
+              <li>
+                By default, if you type <em>api</em>, any host whose name includes the substring api will become part of
+                the set of active hosts.
+              </li>
+              <li>You can reference a host by its full name.</li>
+              <li>
+                You can exclude a host by prefixing it with a minus sign. For example <em>-api1</em> will exclude it
+                from the results.
+              </li>
+              <li>
+                You can match hostnames exactly by id. The string <em>id=1</em> will only retrieve data from that single
+                host.
+              </li>
+              <li>
+                You can select hosts by their type (os, mysql, pgsql, redis and mongo at present), with syntax such as
+                <em>type=os or type=mysql</em>.
+              </li>
+              <li>
+                You can combine expressions to generate complex queries. For example:
+                <em>(type=mysql or type=vitess) and (id=1)</em>.
+              </li>
+            </ul>
           </info-popover>
         </div>
 
-        <gf-form-switch class="gf-form" label="Separate results by host" label-class="width-12" checked="ctrl.target.separateHosts" on-change="ctrl.onChangeInternal()">
+        <gf-form-switch
+          class="gf-form"
+          label="Separate results by host"
+          label-class="width-12"
+          checked="ctrl.target.separateHosts"
+          on-change="ctrl.onChangeInternal()"
+        >
           <div class="gf-form-switch" ng-if="ctrl.target.separateHosts">
-            <input id="vc-separate-hosts" type="checkbox" ng-model="ctrl.target.separateHosts">
+            <input id="vc-separate-hosts" type="checkbox" ng-model="ctrl.target.separateHosts" />
             <label for="vc-separate-hosts" data-on="1" data-off="0"></label>
           </div>
         </gf-form-switch>

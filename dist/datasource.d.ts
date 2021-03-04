@@ -31,11 +31,8 @@ export default class VividCortexDatasource {
     doQuery(target: any, from: number, until: number, dataPoints: number): any;
     /**
      * Interpolate Grafana variables and strip scape characters.
-     *
-     * @param  {string} metric
-     * @return {string}
      */
-    interpolateVariables(metric?: string): any;
+    interpolateVariables(metric?: string): string;
     /**
      * Perform an HTTP request.
      *
@@ -48,19 +45,8 @@ export default class VividCortexDatasource {
     doRequest(endpoint: any, method: any, params?: {}, body?: any): any;
     readResponseHeaders(headers: any, attribute: string): any;
     /**
-     * Take an array of hosts and apply the configured filters.
-     *
-     * @param  {Array}  hosts
-     * @param  {string} config
-     * @return {Array}
-     */
-    filterHosts(hosts: any[], config: string): any[];
-    /**
      * Prepare the metric to be properly interpreted by the API. E.g. if Grafana is using template
      * variables and requesting multiple metrics.
-     *
-     * @param  {string} metric
-     * @return {string}
      */
     transformMetricForQuery(metric?: string): string;
     /**

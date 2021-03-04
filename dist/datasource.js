@@ -1,13 +1,10 @@
-System.register(['moment', './lib/host_filter', './lib/helpers'], function(exports_1) {
-    var moment, host_filter_1, helpers_1;
+System.register(['moment', './lib/helpers'], function(exports_1) {
+    var moment, helpers_1;
     var momentjs, VividCortexDatasource;
     return {
         setters:[
             function (moment_1) {
                 moment = moment_1;
-            },
-            function (host_filter_1_1) {
-                host_filter_1 = host_filter_1_1;
             },
             function (helpers_1_1) {
                 helpers_1 = helpers_1_1;
@@ -30,7 +27,7 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                         title: 'Success',
                     }, error = {
                         status: 'error',
-                        message: 'The configuration test was not successful. Pleaes check your API token and Internet access and try again.',
+                        message: 'The configuration test was not successful. Please check your API token and Internet access and try again.',
                         title: 'Credentials error',
                     };
                     return this.doRequest('metrics', 'GET', { limit: 1 })
@@ -126,24 +123,20 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                         from: from,
                         samplesize: helpers_1.calculateSampleSize(from, until, dataPoints),
                         until: until,
-                        host: null,
+                        host: target.hosts,
                         separateHosts: target.separateHosts ? 1 : 0,
-                    };
-                    var body = {
                         metrics: this.transformMetricForQuery(this.interpolateVariables(target.target)),
                     };
                     var defer = this.$q.defer();
                     this.getActiveHosts(params.from, params.until).then(function (hosts) {
-                        var filteredHosts = _this.filterHosts(hosts, target.hosts);
-                        params.host = filteredHosts.map(function (host) { return host.id; }).join(',');
-                        _this.doRequest('metrics/query-series', 'POST', params, body)
+                        _this.doRequest('metrics/query-series', 'GET', params)
                             .then(function (response) { return ({
                             metrics: response.data.data || [],
                             from: parseInt(_this.readResponseHeaders(response.headers, 'X-Vc-Meta-From'), 10),
                             until: parseInt(_this.readResponseHeaders(response.headers, 'X-Vc-Meta-Until'), 10),
                         }); })
                             .then(function (response) {
-                            defer.resolve(_this.mapQueryResponse(response.metrics, filteredHosts, response.from, response.until));
+                            defer.resolve(_this.mapQueryResponse(response.metrics, hosts, response.from, response.until));
                         })
                             .catch(function (error) {
                             console.error(error);
@@ -154,9 +147,6 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                 };
                 /**
                  * Interpolate Grafana variables and strip scape characters.
-                 *
-                 * @param  {string} metric
-                 * @return {string}
                  */
                 VividCortexDatasource.prototype.interpolateVariables = function (metric) {
                     if (metric === void 0) { metric = ''; }
@@ -193,22 +183,8 @@ System.register(['moment', './lib/host_filter', './lib/helpers'], function(expor
                     return headers.get(attribute);
                 };
                 /**
-                 * Take an array of hosts and apply the configured filters.
-                 *
-                 * @param  {Array}  hosts
-                 * @param  {string} config
-                 * @return {Array}
-                 */
-                VividCortexDatasource.prototype.filterHosts = function (hosts, config) {
-                    var filters = host_filter_1.parseFilters(this.templateSrv.replace(config, null, 'regex'));
-                    return hosts.filter(function (host) { return host_filter_1.testHost(host, filters); });
-                };
-                /**
                  * Prepare the metric to be properly interpreted by the API. E.g. if Grafana is using template
                  * variables and requesting multiple metrics.
-                 *
-                 * @param  {string} metric
-                 * @return {string}
                  */
                 VividCortexDatasource.prototype.transformMetricForQuery = function (metric) {
                     if (metric === void 0) { metric = ''; }
