@@ -14,13 +14,19 @@
       "small": "img/swi-logo.svg",
       "large": "img/swi-logo.svg"
     },
-    "links": [{ "name": "SolarWinds DPM Datasource", "url": "https://github.com/vividcortex/grafana-metrics-datasource" }],
+    "screenshots": [
+      { "name": "setup", "path": "img/grafana-setup.png" },
+      { "name": "metrics", "path": "img/grafana-metric-completion.png" }
+    ],
+    "links": [
+      { "name": "SolarWinds DPM Datasource", "url": "https://github.com/vividcortex/grafana-metrics-datasource" }
+    ],
     "version": "0.0.1",
     "updated": "2018-03-14"
   },
 
   "dependencies": {
-    "grafanaVersion": "4.5.x",
+    "grafanaDependency": "4.5.x",
     "plugins": []
   },
 
