@@ -12,4 +12,4 @@ jobs:
       - uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag
 
-      - run: echo ${{ steps.get-latest-tag.outputs }}
+      - run: echo ${{ steps.get-latest-tag.outputs.tag }}
