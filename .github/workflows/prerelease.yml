@@ -7,7 +7,9 @@ jobs:
     name: Version
     runs-on: ubuntu-latest
     steps:
-      - id: get_version
-        uses: battila7/get-version-action@v2
+      - uses: actions/checkout@v2
 
-      - run: echo ${{ steps.get_version.outputs }}
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+
+      - run: echo ${{ steps.get-latest-tag.outputs }}
