@@ -13,7 +13,7 @@
   "author": "VividCortex",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "q": "^1.5.1",
     "systemjs": "^6.1.1"
   },
